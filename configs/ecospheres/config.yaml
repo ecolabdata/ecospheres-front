@@ -81,6 +81,8 @@ website:
       to: /datasets
     - text: Bouquets
       to: /bouquets
+    - text: Tableau de bord
+      to: /dashboard
     - text: A propos
       to: /about
   router:
@@ -99,6 +101,10 @@ website:
         id: 'terms'
         route: '/terms'
         url: '/ecospheres/pages/terms.md'
+      - title: Tableau de bord
+        id: dashboard
+        url: '/ecospheres/pages/dashboard.md'
+        route: /dashboard
   home_buttons:
   topic_charts:
     display: false

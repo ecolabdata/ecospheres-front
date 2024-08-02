@@ -25,9 +25,10 @@ export const descriptionFromMarkdown = (ref, attr = 'description') => {
  *
  * @param {string} value
  */
-export const fromMarkdown = (value) => {
+export const fromMarkdown = (value, safe = false) => {
   if (!value) return ''
   const parsed = marked.parse(value, markedOptions)
+  if (safe) return parsed
   return DOMPurify.sanitize(parsed)
 }
 
