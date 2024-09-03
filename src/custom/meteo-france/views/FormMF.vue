@@ -1,27 +1,18 @@
 <script setup lang="ts">
 import { ResourceAccordion } from '@datagouv/components'
 import type { Resource } from '@datagouv/components'
+import Slider from '@vueform/slider'
+import '@vueform/slider/themes/default.css'
 import { ref, type Ref } from 'vue'
 
 import config from '@/config'
 
 import datasetsIds from '../assets/datasets.json'
 import deps from '../assets/deps.json'
-
-interface Indicateur {
-  name: string
-  code: string
-}
-
-interface Dataset {
-  prod: string
-  dev: string
-  id: string
-  departement: boolean
-  periode: boolean
-  indicateur?: boolean
-  indicateursListe?: Indicateur[]
-}
+import stations from '../assets/stations.json'
+import MapComponent from '../components/MapComponent.vue'
+import ModalComponent from '../components/Modal.vue'
+import type { FeatureCollection, Dataset, Station } from '../types'
 
 type DatasetIds = {
   [pack: string]: Record<string, Dataset>
@@ -64,6 +55,7 @@ const onSelectDataPack = (pack: string) => {
   selectedDep.value = null
   selectedPeriod.value = null
   selectedIndicateur.value = null
+  showCustomFilter.value = false
   filteredResources.value = []
 
   selectedDataPack.value = pack
@@ -83,6 +75,7 @@ const onSelectDataset = (dataset: string) => {
   selectedDep.value = null
   selectedPeriod.value = null
   selectedIndicateur.value = null
+  showCustomFilter.value = false
 
   filteredResources.value = []
 
@@ -123,6 +116,34 @@ const onSelectDataset = (dataset: string) => {
   }
 }
 
+function filterGeoJSONByNumDep(
+  geojson: FeatureCollection,
+  numDepValue: string
+): FeatureCollection {
+  const filteredGeoJSON: FeatureCollection = {
+    type: 'FeatureCollection',
+    features: []
+  }
+
+  geojson.features.forEach((feature) => {
+    if (feature.properties.NUM_DEP === numDepValue) {
+      filteredGeoJSON.features.push(feature)
+    }
+  })
+
+  return filteredGeoJSON
+}
+
+function getCsv(url: string) {
+  showModal.value = true
+  window.location.href = url
+}
+
+function copyToClipboard(url: string) {
+  navigator.clipboard.writeText(url)
+  copyText.value = 'Lien copié !'
+}
+
 function onSelectDep(event: Event) {
   optionsPeriod.value = []
   selectedPeriod.value = null
@@ -133,6 +154,23 @@ function onSelectDep(event: Event) {
   res = [...new Set(res)]
   optionsPeriod.value = res
   showPeriod.value = true
+  if (selectedDataPack.value == 'Données climatologiques de base') {
+    for (let obj of deps) {
+      if (obj.code === selectedDep.value) {
+        mapOptions.value = obj
+        mapPoints.value = filterGeoJSONByNumDep(stations, selectedDep.value)
+        showCustomFilter.value = true
+        const splitRanges = optionsPeriod.value.flatMap((range) =>
+          range.split('-').map(Number)
+        )
+        minSlider.value = Math.min(...splitRanges)
+        maxSlider.value = Math.max(...splitRanges)
+        valuesSlider.value = [minSlider.value, maxSlider.value]
+      }
+    }
+  } else {
+    showCustomFilter.value = false
+  }
 }
 
 function onSelectPeriod(event: Event) {
@@ -158,6 +196,37 @@ function onSelectIndicateur(event: Event) {
     r.includes('_' + selectedIndicateur.value)
   )
 }
+
+const configDep = {
+  zoom: 6.8,
+  minx: 4.7441167394752,
+  miny: 44.696067584965,
+  maxx: 6.3588423781754,
+  maxy: 45.883269928025
+}
+const mapOptions = ref(configDep)
+const mapPoints = ref<FeatureCollection>({
+  type: 'FeatureCollection',
+  features: []
+})
+
+const postes = ref<Station[]>([])
+
+const handlePostesUpdate = (newPostes: Station[]) => {
+  postes.value = newPostes
+}
+
+const showCustomFilter = ref(false)
+
+const minSlider = ref(0)
+const maxSlider = ref(100)
+const valuesSlider = ref([0, 100])
+
+const copyText = ref('Copier le lien URL direct du fichier CSV')
+const showModal = ref(false)
+const modalMessage = ref(
+  'Le lancement du téléchargement peut prendre un moment. Patientez svp...'
+)
 </script>
 
 <template>
@@ -195,6 +264,180 @@ function onSelectIndicateur(event: Event) {
           {{ dep['name'] }} ({{ dep['code'] }})
         </option>
       </select>
+    </div>
+    <div v-if="showCustomFilter">
+      <h4>Téléchargement par station</h4>
+      <p>
+        Sélectionner les stations désirées en cliquant sur les points de la
+        carte
+      </p>
+      <MapComponent
+        :options="mapOptions"
+        :points="mapPoints"
+        @update:postes="handlePostesUpdate"
+      />
+      <br />
+      <div v-if="postes.length > 0">
+        Vous avez sélectionné les stations :
+        <span v-for="item in postes">{{ item.name }} ; </span>
+      </div>
+      <br />
+      <p>Sélectionner la période (5 ans maximum) :</p>
+      <Slider
+        :min="minSlider"
+        :max="maxSlider"
+        v-model="valuesSlider"
+        class="slider-dsfr"
+      />
+      <br />
+      <div v-if="valuesSlider[1] - valuesSlider[0] > 5">
+        ⚠️ Attention, les exports automatiques sont limités à 5 ans maximum.
+        Réduisez la période ci-dessus.
+      </div>
+      <div v-if="postes.length == 0">
+        ⚠️ Attention, vous devez sélectionner au moins une station ci-dessus.
+      </div>
+      <div v-if="postes.length > 0 && valuesSlider[1] - valuesSlider[0] <= 5">
+        <span v-if="selectedDataset && selectedDataset.id == 'QUOT'">
+          <button
+            type="button"
+            class="fr-btn"
+            @click="
+              getCsv(
+                'https://meteo-api.data.gouv.fr/api/clim/base_' +
+                  (selectedDataset ? selectedDataset.id.toLowerCase() : '') +
+                  '_vent/' +
+                  selectedDep +
+                  '/csv/?num_postes=' +
+                  postes.map((post) => post.id).join(',') +
+                  '&anneemin=' +
+                  valuesSlider[0] +
+                  '&anneemax=' +
+                  valuesSlider[1]
+              )
+            "
+          >
+            Télécharger les données "Vent" en CSV
+          </button>
+          &nbsp;&nbsp;
+          <button
+            type="button"
+            class="fr-btn fr-btn--secondary"
+            @click="
+              copyToClipboard(
+                'https://meteo-api.data.gouv.fr/api/clim/base_' +
+                  (selectedDataset ? selectedDataset.id.toLowerCase() : '') +
+                  '_vent/' +
+                  selectedDep +
+                  '/csv/?num_postes=' +
+                  postes.map((post) => post.id).join(',') +
+                  '&anneemin=' +
+                  valuesSlider[0] +
+                  '&anneemax=' +
+                  valuesSlider[1]
+              )
+            "
+          >
+            {{ copyText }}
+          </button>
+          <br /><br />
+          <button
+            type="button"
+            class="fr-btn"
+            @click="
+              getCsv(
+                'https://meteo-api.data.gouv.fr/api/clim/base_' +
+                  (selectedDataset ? selectedDataset.id.toLowerCase() : '') +
+                  '_autres/' +
+                  selectedDep +
+                  '/csv/?num_postes=' +
+                  postes.map((post) => post.id).join(',') +
+                  '&anneemin=' +
+                  valuesSlider[0] +
+                  '&anneemax=' +
+                  valuesSlider[1]
+              )
+            "
+          >
+            Télécharger les données "Autres paramètres" en CSV
+          </button>
+          &nbsp;&nbsp;
+          <button
+            type="button"
+            class="fr-btn fr-btn--secondary"
+            @click="
+              copyToClipboard(
+                'https://meteo-api.data.gouv.fr/api/clim/base_' +
+                  (selectedDataset ? selectedDataset.id.toLowerCase() : '') +
+                  '_autres/' +
+                  selectedDep +
+                  '/csv/?num_postes=' +
+                  postes.map((post) => post.id).join(',') +
+                  '&anneemin=' +
+                  valuesSlider[0] +
+                  '&anneemax=' +
+                  valuesSlider[1]
+              )
+            "
+          >
+            {{ copyText }}
+          </button>
+        </span>
+        <span v-else>
+          <button
+            type="button"
+            class="fr-btn"
+            @click="
+              getCsv(
+                'https://meteo-api.data.gouv.fr/api/clim/base_' +
+                  (selectedDataset ? selectedDataset.id.toLowerCase() : '') +
+                  '/' +
+                  selectedDep +
+                  '/csv/?num_postes=' +
+                  postes.map((post) => post.id).join(',') +
+                  '&anneemin=' +
+                  valuesSlider[0] +
+                  '&anneemax=' +
+                  valuesSlider[1]
+              )
+            "
+          >
+            Télécharger les données en CSV
+          </button>
+          &nbsp;&nbsp;
+          <button
+            type="button"
+            class="fr-btn fr-btn--secondary"
+            @click="
+              copyToClipboard(
+                'https://meteo-api.data.gouv.fr/api/clim/base_' +
+                  (selectedDataset ? selectedDataset.id.toLowerCase() : '') +
+                  '/' +
+                  selectedDep +
+                  '/csv/?num_postes=' +
+                  postes.map((post) => post.id).join(',') +
+                  '&anneemin=' +
+                  valuesSlider[0] +
+                  '&anneemax=' +
+                  valuesSlider[1]
+              )
+            "
+          >
+            {{ copyText }}
+          </button>
+        </span>
+        <ModalComponent
+          :show="showModal"
+          :message="modalMessage"
+          @close="showModal = false"
+        />
+      </div>
+      <br /><br />
+      <h4>Téléchargement par période</h4>
+      <p>
+        Vous pouvez également télécharger les fichiers par grand groupes de
+        période.
+      </p>
     </div>
 
     <div v-if="selectedDep && showPeriod" class="select-classic">
@@ -328,5 +571,11 @@ function onSelectIndicateur(event: Event) {
   padding: 20px;
   margin-top: 20px;
   border-radius: 5px;
+}
+
+.slider-dsfr {
+  --slider-connect-bg: #3558a2;
+  --slider-tooltip-bg: #3558a2;
+  --slider-handle-ring-color: #3558a230;
 }
 </style>
