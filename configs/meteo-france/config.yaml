@@ -4,9 +4,9 @@ datagouvfr:
   # data.gouv.fr base URL
   base_url: https://www.data.gouv.fr
   # oauth settings
-  oauth_client_id:
+  oauth_client_id: 66d1ecc08223699099a7c24b
   # pkce client secret, explicitely public
-  oauth_client_secret:
+  oauth_client_secret: BWJW8QxyT0h1dauey71e1JjgxtIJZDYtV07mS3oSfnIjSvKu4K
 
 universe:
   # "universe" topic id
@@ -34,25 +34,25 @@ website:
     title: 'La météo et le climat en Open Data'
     subtitle: 'meteo.data.gouv.fr vise à référencer, héberger et diffuser les données publiques météorologiques produites par Météo-France. Vous y trouverez des données téléchargeables et utilisables de manière libre et gratuite.'
     sections:
-      - title: Thématiques
+      - title: Bouquets de données
         content:
         sub_section_datasets:
         sub_section_cards:
-        sub_section_tiles:
           title:
-          tiles:
-            - id: '6571f26dc009674feb726be9'
-              name: 'Données climatologiques de base'
+          cards:
+            - name: 'Données climatologiques (par station et spatialisées)'
               description: 'Données climatologiques pour toutes les stations françaises depuis leur ouverture, pour tous les paramètres disponibles.'
-              url: 'datasets?topic=6571f26dc009674feb726be9'
-            - id: '6571f2db0273fc306408f265'
-              name: 'Données climatologiques de référence pour le changement climatique'
+              url: 'bouquets?theme=Données+climatologiques'
+              image_url: '/meteo-france/assets/climatologie.png'
+            - name: 'Données de référence pour le changement climatique'
               description: 'Données recommandées par Météo-France pour réaliser des diagnostics et études climatiques.'
-              url: 'datasets?topic=6571f2db0273fc306408f265'
-            - id: '65e0c82c2da27c1dff5fa66f'
-              name: 'Données de Prévision Numérique du Temps (PNT)'
-              description: 'Accès en temps réel aux résultats des dernières prévisions des modèles de prévision numérique jusqu’à 4 jours d’échéance.'
-              url: 'datasets?topic=65e0c82c2da27c1dff5fa66f'
+              url: 'bouquets?theme=Données+de+référence+pour+le+changement+climatique'
+              image_url: '/meteo-france/assets/changement.png'
+            - name: 'Données de Prévision Numérique du Temps (PNT)'
+              description: 'Données temps réel des dernières prévisions des modèles de prévision numérique jusqu’à 4 jours d’échéance.'
+              url: 'bouquets?theme=Données+de+prévision+numérique+du+temps+(PNT)'
+              image_url: '/meteo-france/assets/pnt.png'
+        sub_section_tiles:
         sub_section_buttons:
       - title: Actualités
         content: >-
@@ -80,9 +80,7 @@ website:
     name: 'Recherche guidée'
     link: '/form'
   menu:
-    - text: Données
-      to: /datasets
-    - text: Bouquets
+    - text: Accès aux données
       to: /bouquets
     - text: Recherche guidée
       to: /form
@@ -109,12 +107,6 @@ website:
         url: '/meteo-france/pages/hackathon.md'
   show_quality_component: true
   list_search_topics:
-    - id: '6571f26dc009674feb726be9'
-      name: 'Données climatologiques de base'
-    - id: '6571f2db0273fc306408f265'
-      name: 'Données climatologiques de référence pour le changement climatique'
-    - id: '65e0c82c2da27c1dff5fa66f'
-      name: 'Données de Prévision Numérique du Temps (PNT)'
   url_search_topics: 'datasets'
   oauth_option: true
   footer_phrase: 'Ce site est une déclinaison thématique de data.gouv.fr sur les données relatives à la météo et au climat réalisé en collaboration avec Météo-France.'
@@ -155,7 +147,7 @@ website:
   discussions:
     dataset:
       display: true
-      create: false
+      create: true
     topic:
       display: false
       create: false
@@ -167,12 +159,12 @@ website:
     show_extended_information_panel: false
   topics:
     slug: bouquets
-    name: bouquet
+    name: bouquet de donnée
     extras_key: 'meteofrance'
     themes:
-      usage: false
-      main_name: thématique
-      secondary_name: chantier
+      usage: true
+      main_name: catégorie
+      secondary_name: sous-catégorie
     # include a list page with all topics
     list_all: false
     display_metadata: false
@@ -183,21 +175,44 @@ website:
       authorized_users:
         - 6230733357772160a4f77fbaxx
 themes:
-  - name: Données climatologiques
+  - name: Informations sur les stations
     color: 043574
     textColor: FFFFFF
     subthemes:
-      - name: Informations sur les stations
-      - name: Données climatologiques de base
-      - name: Références à la station
-      - name: Données de références pour le changement climatiques
+      - name: Stations du réseau Météo-France
+      - name: Stations complémentaires
+  - name: Données climatologiques
+    color: 1E929E
+    textColor: FFFFFF
+    subthemes:
+      - name: Données à la station du réseau Météo-France
+      - name: Données stations complémentaires
+      - name: Données spatialisées
+  - name: Données de référence pour le changement climatique
+    color: 1E929E
+    textColor: FFFFFF
+    subthemes:
+      - name: Données à la station
+      - name: Données spatialisées
   - name: Données de prévision numérique du temps (PNT)
     color: 1E929E
     textColor: FFFFFF
     subthemes:
-      - name: ARPEGE
-      - name: AROME
-      - name: Modèle de vague haute
+      - name: Paquets issus du modèle AROME
+      - name: Paquets issus du modèle ARPEGE
+      - name: Paquets issus de modèle de vagues
+      - name: Paquets issus de modèle de surcote océanique
+  # - name: Données d'observations
+  #   color: 1E929E
+  #   textColor: FFFFFF
+  #   subthemes:
+  #     - name: Données d'observations
+  # - name: Références climatiques
+  #   color: 1E929E
+  #   textColor: FFFFFF
+  #   subthemes:
+  #     - name: Référence à la station
+  #     - name: Référence spatialisées
 
 # list of organisations' ids that should be handled by the portal
 # to find an id go to https://www.data.gouv.fr/fr/organizations/ministere-de-la-transition-ecologique/
