@@ -4,14 +4,15 @@ import { computed, type ComputedRef, onMounted, toRef } from 'vue'
 import config from '@/config'
 import type { Theme } from '@/model/theme'
 import { useTopicStore } from '@/store/TopicStore'
-import { useTopicsConf } from '@/utils/config'
+import { useSearchPagesConfig } from '@/utils/config'
 import { useThemeOptions } from '@/utils/theme'
 
 import Tile from './Tile.vue'
 
 const topicStore = useTopicStore()
 
-const { topicsName, topicsSlug, topicsExtrasKey } = useTopicsConf()
+const { searchPageName, searchPageSlug, searchPageExtrasKey } =
+  useSearchPagesConfig(route.path.replace('/admin', '').split('/')[1])
 
 const getThemeColor = (theme: Theme) => {
   const themeName = toRef(theme.name)
@@ -20,16 +21,18 @@ const getThemeColor = (theme: Theme) => {
 }
 
 const getThemeDescription = (theme: Theme) => {
-  const nbBouquets = topicStore.data.filter((topic) => {
-    return !topic.private && topic.extras[topicsExtrasKey].theme === theme.name
+  const nbTopics = topicStore.data.filter((topic) => {
+    return (
+      !topic.private && topic.extras[searchPageExtrasKey].theme === theme.name
+    )
   }).length
-  switch (nbBouquets) {
+  switch (nbTopics) {
     case 0:
-      return `Aucun  ${topicsName}`
+      return `Aucun  ${searchPageName}`
     case 1:
-      return `1 ${topicsName}`
+      return `1 ${searchPageName}`
     default:
-      return `${nbBouquets} ${topicsName}s`
+      return `${nbTopics} ${searchPageName}s`
   }
 }
 
@@ -42,7 +45,7 @@ const themesWithDescriptions: ComputedRef<Array<[Theme, string]>> = computed(
 )
 
 onMounted(() => {
-  topicStore.loadTopicsForUniverse()
+  topicStore.loadTopicsForUniverse([searchPageSlug])
 })
 </script>
 
@@ -58,7 +61,7 @@ onMounted(() => {
       >
         <Tile
           :style="`--themeColor: ${getThemeColor(theme)}`"
-          :link="{ name: topicsSlug, query: { theme: theme.name } }"
+          :link="{ name: searchPageSlug, query: { theme: theme.name } }"
           :title="theme.name"
           :description="description"
         />

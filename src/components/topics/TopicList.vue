@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
 import type { ComputedRef, PropType } from 'vue'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useLoading } from 'vue-loading-overlay'
 import { useRoute, useRouter, type LocationQueryRaw } from 'vue-router'
 
-import { NoOptionSelected } from '@/model/theme'
 import type { Topic } from '@/model/topic'
 import { useTopicStore } from '@/store/TopicStore'
 import { useUserStore } from '@/store/UserStore'
-import { useTopicsConf } from '@/utils/config'
+import { useSearchPagesConfig } from '@/utils/config'
 
 const router = useRouter()
 const route = useRoute()
-const topicStore = useTopicStore()
+let topicStore = useTopicStore()
 
-const { topicsName, topicsSlug, topicsExtrasKey } = useTopicsConf()
+const searchPageName = ref<string>('')
+const searchPageSlug = ref<string>('')
+const searchPageExtrasKey = ref<string>('')
+const searchPageLabelTitle = ref<string>('')
+
+const config = useSearchPagesConfig(
+  route.path.replace('/admin', '').split('/')[1]
+)
+searchPageName.value = config.searchPageName
+searchPageSlug.value = config.searchPageSlug
+searchPageExtrasKey.value = config.searchPageExtrasKey
+searchPageLabelTitle.value = config.searchPageLabelTitle
 
 const userStore = useUserStore()
-const { canAddBouquet } = storeToRefs(userStore)
 
 const props = defineProps({
-  themeName: {
-    type: String,
-    default: NoOptionSelected
-  },
-  subthemeName: {
-    type: String,
-    default: NoOptionSelected
-  },
   showDrafts: {
     type: Boolean
   },
@@ -44,68 +44,89 @@ const props = defineProps({
 
 const emits = defineEmits(['clearFilters'])
 
-const bouquets: ComputedRef<Topic[]> = computed(() => {
+const topics: ComputedRef<Topic[]> = computed(() => {
   return topicStore.sorted
-    .filter((bouquet) => {
-      return !props.showDrafts ? !bouquet.private : true
+    .filter((topic) => {
+      return !props.showDrafts ? !topic.private : true
     })
-    .filter((bouquet) => {
+    .filter((topic) => {
       if (props.geozone === null) return true
       return (
-        bouquet.spatial?.zones &&
-        bouquet.spatial.zones.length > 0 &&
-        bouquet.spatial.zones.includes(props.geozone)
+        topic.spatial?.zones &&
+        topic.spatial.zones.length > 0 &&
+        topic.spatial.zones.includes(props.geozone)
       )
     })
-    .filter((bouquet) => {
-      if (props.themeName === NoOptionSelected) return true
-      return bouquet.extras[topicsExtrasKey].theme === props.themeName
-    })
-    .filter((bouquet) => {
-      if (props.subthemeName === NoOptionSelected) return true
-      return bouquet.extras[topicsExtrasKey].subtheme === props.subthemeName
-    })
-    .filter((bouquet) => {
+    .filter((topic) => {
       if (props.query === '') return true
-      return bouquet.name.toLowerCase().includes(props.query.toLowerCase())
+      return topic.name.toLowerCase().includes(props.query.toLowerCase())
     })
 })
 
 const numberOfResultMsg: ComputedRef<string> = computed(() => {
-  if (bouquets.value.length === 1) {
-    return `1 ${topicsName} disponible`
-  } else if (bouquets.value.length > 1) {
-    return bouquets.value.length + ` ${topicsName}s disponibles`
+  if (topics.value.length === 1) {
+    return `1 ${searchPageLabelTitle.value} disponible`
+  } else if (topics.value.length > 1) {
+    return topics.value.length + ` ${searchPageLabelTitle.value} disponibles`
   } else {
     return 'Aucun résultat ne correspond à votre recherche'
   }
 })
 
 const createUrl = computed(() => {
-  return { name: `${topicsSlug}_add`, query: route.query }
+  return { name: `${searchPageSlug.value}_add`, query: route.query }
 })
 
 const clearFilters = () => {
   const query: LocationQueryRaw = {}
   if (route.query.drafts) query.drafts = route.query.drafts
-  router.push({ name: topicsSlug, query }).then(() => {
+  router.push({ name: searchPageSlug.value, query }).then(() => {
     emits('clearFilters')
   })
 }
 
 onMounted(() => {
   const loader = useLoading().show({ enforceFocus: false })
-  topicStore.loadTopicsForUniverse().then(() => loader.hide())
+  topicStore
+    .loadTopicsForUniverse([searchPageSlug.value])
+    .then(() => loader.hide())
 })
 
 defineExpose({
   numberOfResultMsg
 })
+
+const updateTopics = () => {
+  let tags = [searchPageSlug.value]
+  const loader = useLoading().show({ enforceFocus: false })
+  topicStore.isLoaded = false
+  if (route.query.tags) {
+    let filteredTags = route.query.tags.toString().split(',')
+    tags = [...tags, ...filteredTags]
+  }
+  topicStore.loadTopicsForUniverse(tags).then(() => loader.hide())
+}
+
+watch(
+  () => route.fullPath,
+  () => {
+    const config = useSearchPagesConfig(
+      route.path.replace('/admin', '').split('/')[1]
+    )
+    if (config) {
+      searchPageName.value = config.searchPageName
+      searchPageSlug.value = config.searchPageSlug
+      searchPageExtrasKey.value = config.searchPageExtrasKey
+      searchPageLabelTitle.value = config.searchPageLabelTitle
+      updateTopics()
+    }
+  }
+)
 </script>
 
 <template>
   <div
-    v-if="bouquets.length > 0"
+    v-if="topics.length > 0"
     class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle justify-between fr-pb-2w"
   >
     <h2 class="fr-col-auto fr-my-0 h4">{{ numberOfResultMsg }}</h2>
@@ -127,7 +148,7 @@ defineExpose({
     </div>
   </div>
   <div
-    v-if="bouquets.length === 0"
+    v-if="topics.length === 0"
     class="fr-mt-2w rounded-xxs fr-p-3w fr-grid-row flex-direction-column bg-contrast-blue-cumulus"
   >
     <div class="fr-col fr-grid-row fr-grid-row--gutters text-blue-400">
@@ -151,7 +172,7 @@ defineExpose({
           <p class="fr-mt-1v fr-mb-3v">
             Essayez de réinitialiser les filtres pour agrandir votre champ de
             recherche.<br />
-            Vous pouvez aussi contribuer en créant un {{ topicsName }}.
+            Vous pouvez aussi contribuer en créant un {{ searchPageName }}.
           </p>
         </div>
         <div class="fr-grid-row fr-grid-row--undefined">
@@ -159,21 +180,21 @@ defineExpose({
             Réinitialiser les filtres
           </button>
           <router-link
-            v-if="canAddBouquet"
+            v-if="userStore.canAddTopic(searchPageSlug)"
             :to="createUrl"
             class="fr-btn fr-btn--secondary fr-ml-1w"
           >
             <VIcon name="ri-add-circle-line" class="fr-mr-1v" />
-            Ajouter un {{ topicsName }}
+            Ajouter un {{ searchPageName }}
           </router-link>
         </div>
       </div>
     </div>
   </div>
-  <div class="bouquets-list-container fr-container fr-mb-4w border-top">
+  <div class="topics-list-container fr-container fr-mb-4w border-top">
     <ul class="fr-mt-3w fr-pl-0" role="list">
-      <li v-for="bouquet in bouquets" :key="bouquet.id" class="fr-col-12">
-        <BouquetCard :bouquet="bouquet" />
+      <li v-for="topic in topics" :key="topic.id" class="fr-col-12">
+        <TopicCard :topic="topic" />
       </li>
     </ul>
   </div>
@@ -181,7 +202,7 @@ defineExpose({
 
 <style scoped>
 /* "revert" gutters — simpler than w/o gutters */
-.bouquets-list-container {
+.topics-list-container {
   padding-right: 0;
   padding-left: 0;
 }

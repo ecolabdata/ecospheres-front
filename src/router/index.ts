@@ -8,11 +8,10 @@ import {
 
 import config from '@/config'
 import type { PageConfig } from '@/model/config'
-import { useTopicsConf } from '@/utils/config'
+import { getAllSearchPagesConfig } from '@/utils/config'
 import NotFoundView from '@/views/NotFoundView.vue'
 import SimplePageView from '@/views/SimplePageView.vue'
 
-const { topicsSlug, topicsName } = useTopicsConf()
 const disableRoutes: string[] = config.website.router.disable ?? []
 
 // common/default routes
@@ -75,50 +74,6 @@ const defaultRoutes: RouteRecordRaw[] = [
       }
     ]
   },
-  {
-    path: `/${topicsSlug}`,
-    children: [
-      {
-        path: '',
-        name: topicsSlug,
-        meta: {
-          title: capitalize(topicsName) + 's'
-        },
-        component: async () =>
-          await import('@/views/bouquets/BouquetsListView.vue'),
-        props: (route: RouteLocationNormalizedLoaded) => ({
-          query: route.query.q,
-          subtheme: route.query.subtheme,
-          theme: route.query.theme,
-          geozone: route.query.geozone,
-          drafts: route.query.drafts
-        })
-      },
-      {
-        path: ':bid',
-        name: `${topicsSlug}_detail`,
-        props: (route: RouteLocationNormalizedLoaded) => ({
-          bouquetId: route.params.bid
-        }),
-        component: async () =>
-          await import('@/views/bouquets/BouquetDetailView.vue')
-      }
-    ]
-  },
-  {
-    path: `/admin/${topicsSlug}/add`,
-    name: `${topicsSlug}_add`,
-    component: async () => await import('@/views/bouquets/BouquetFormView.vue'),
-    meta: { requiresAuth: true },
-    props: { isCreate: true }
-  },
-  {
-    path: `/admin/${topicsSlug}/edit/:bid`,
-    name: `${topicsSlug}_edit`,
-    component: async () => await import('@/views/bouquets/BouquetFormView.vue'),
-    meta: { requiresAuth: true },
-    props: { isCreate: false }
-  },
   // technical pages
   {
     path: '/404',
@@ -128,9 +83,56 @@ const defaultRoutes: RouteRecordRaw[] = [
     },
     component: NotFoundView
   }
-].filter((route) => {
-  if (route.name === undefined) return true
-  return !disableRoutes.includes(route.name)
+]
+
+// search pages
+getAllSearchPagesConfig().forEach((searchPage) => {
+  defaultRoutes.push(
+    {
+      path: `/${searchPage.searchPageSlug}`,
+      children: [
+        {
+          path: '',
+          name: searchPage.searchPageSlug,
+          meta: {
+            title: capitalize(searchPage.searchPageName) + 's'
+          },
+          component: async () =>
+            await import('@/views/topics/TopicsListView.vue'),
+          props: (route: RouteLocationNormalizedLoaded) => ({
+            query: route.query.q,
+            subtheme: route.query.subtheme,
+            theme: route.query.theme,
+            geozone: route.query.geozone,
+            drafts: route.query.drafts
+          })
+        },
+        {
+          path: ':bid',
+          name: `${searchPage.searchPageSlug}_detail`,
+          props: (route: RouteLocationNormalizedLoaded) => ({
+            topicId: route.params.bid
+          }),
+          component: async () =>
+            await import('@/views/topics/TopicDetailView.vue')
+        }
+      ]
+    },
+    {
+      path: `/admin/${searchPage.searchPageSlug}/add`,
+      name: `${searchPage.searchPageSlug}_add`,
+      component: async () => await import('@/views/topics/TopicFormView.vue'),
+      meta: { requiresAuth: true },
+      props: { isCreate: true }
+    },
+    {
+      path: `/admin/${searchPage.searchPageSlug}/edit/:bid`,
+      name: `${searchPage.searchPageSlug}_edit`,
+      component: async () => await import('@/views/topics/TopicFormView.vue'),
+      meta: { requiresAuth: true },
+      props: { isCreate: false }
+    }
+  )
 })
 
 // pages

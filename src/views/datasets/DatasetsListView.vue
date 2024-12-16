@@ -1,15 +1,7 @@
 <script setup lang="ts">
 import { DatasetCard } from '@datagouv/components'
 import { useDebounceFn } from '@vueuse/core'
-import {
-  capitalize,
-  computed,
-  inject,
-  onMounted,
-  ref,
-  watch,
-  type Ref
-} from 'vue'
+import { computed, inject, onMounted, ref, watch, type Ref } from 'vue'
 import { useLoading } from 'vue-loading-overlay'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -24,7 +16,6 @@ import { useOrganizationStore } from '@/store/OrganizationStore'
 import { useSearchStore } from '@/store/SearchStore'
 import { useTopicStore } from '@/store/TopicStore'
 import { useUserStore } from '@/store/UserStore'
-import { useTopicsConf } from '@/utils/config'
 
 defineEmits(['search'])
 const props = defineProps({
@@ -69,8 +60,6 @@ const title = config.website.title as string
 const topicItems = config.website.list_search_topics as TopicItemConf[]
 const hasOrganizationFilter = config.website.datasets
   .organization_filter as boolean
-
-const { topicsMainTheme } = useTopicsConf()
 
 const setAccessibilityProperties = inject(
   AccessibilityPropertiesKey
@@ -256,7 +245,7 @@ onMounted(() => {
 
     <div class="fr-col-md-12 fr-mb-2w">
       <SearchComponent
-        id="search-bouquet"
+        id="search-topic"
         v-model="localQuery"
         :is-filter="true"
         search-label="Filtrer des données"
@@ -266,6 +255,7 @@ onMounted(() => {
         @search="$emit('search', $event)"
       />
     </div>
+    <!--
     <div v-if="topicItems" class="fr-col-md-12 fr-mb-2w">
       <DsfrSelect
         :model-value="selectedTopicId"
@@ -276,6 +266,7 @@ onMounted(() => {
         <template #label>{{ capitalize(topicsMainTheme) }}s</template>
       </DsfrSelect>
     </div>
+    -->
     <div v-if="hasOrganizationFilter" class="fr-col-md-12 fr-mb-2w">
       <DsfrSelect
         :model-value="selectedOrganizationId"

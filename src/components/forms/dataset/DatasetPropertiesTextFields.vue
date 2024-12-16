@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { DatasetProperties } from '@/model/topic'
-import { useTopicsConf } from '@/utils/config'
+import { useSearchPagesConfig } from '@/utils/config'
+import { useRoute } from 'vue-router'
 
 const props = defineProps({
   datasetProperties: {
@@ -9,7 +10,11 @@ const props = defineProps({
   }
 })
 
-const { topicsName } = useTopicsConf()
+const route = useRoute()
+
+const { searchPageLabelTitle } = useSearchPagesConfig(
+  route.path.replace('/admin', '').split('/')[1]
+)
 
 const emit = defineEmits(['update:datasetProperties'])
 
@@ -44,7 +49,8 @@ const updateDatasetProperties = (
   </div>
   <div class="fr-input-group">
     <label class="fr-label" for="input-purpose"
-      >Raison d'utilisation dans ce {{ topicsName }} (obligatoire)</label
+      >Raison d'utilisation dans ce
+      {{ searchPageLabelTitle }} (obligatoire)</label
     >
     <textarea
       id="input-purpose"

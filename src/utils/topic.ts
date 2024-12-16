@@ -8,6 +8,7 @@ import {
 } from 'vue'
 
 import type { BreadcrumbItem } from '@/model/breadcrumb'
+import type { SiteId } from '@/model/topic'
 import {
   Availability,
   type DatasetProperties,
@@ -18,10 +19,6 @@ import {
 } from '@/model/topic'
 import { useTopicStore } from '@/store/TopicStore'
 import { useUserStore } from '@/store/UserStore'
-import { useTopicsConf } from '@/utils/config'
-
-const { topicsSlug, topicsName, topicsExtrasKey, topicsUseThemes } =
-  useTopicsConf()
 
 export const isAvailable = (availability: Availability): boolean => {
   return [Availability.LOCAL_AVAILABLE, Availability.URL_AVAILABLE].includes(
@@ -31,12 +28,13 @@ export const isAvailable = (availability: Availability): boolean => {
 
 export const updateTopicExtras = (
   topic: Topic,
-  data: Partial<SiteTopicExtras>
+  data: Partial<SiteTopicExtras>,
+  searchPageExtrasKey: SiteId
 ): TopicExtras => {
   return {
     ...topic.extras,
-    [topicsExtrasKey]: {
-      ...topic.extras[topicsExtrasKey],
+    [searchPageExtrasKey]: {
+      ...topic.extras[searchPageExtrasKey],
       ...data
     }
   }
@@ -45,7 +43,10 @@ export const updateTopicExtras = (
 /**
  * Build a fonctionnal v1 (POST format) topic from clone source data
  */
-export const cloneTopic = (topic: Topic): TopicPostData => {
+export const cloneTopic = (
+  topic: Topic,
+  searchPageExtrasKey: SiteId
+): TopicPostData => {
   const { id, slug, ...data } = topic
   return {
     ...data,
@@ -54,19 +55,23 @@ export const cloneTopic = (topic: Topic): TopicPostData => {
     reuses: [],
     spatial: undefined,
     owner: useUserStore().data ?? null,
-    extras: updateTopicExtras(topic, {
-      cloned_from: topic.id,
-      datasets_properties: topic.extras[
-        topicsExtrasKey
-      ].datasets_properties.map((dp) => {
-        return {
-          ...dp,
-          id: null,
-          uri: null,
-          availability: Availability.NOT_AVAILABLE
-        }
-      })
-    })
+    extras: updateTopicExtras(
+      topic,
+      {
+        cloned_from: topic.id,
+        datasets_properties: topic.extras[
+          searchPageExtrasKey
+        ].datasets_properties.map((dp) => {
+          return {
+            ...dp,
+            id: null,
+            uri: null,
+            availability: Availability.NOT_AVAILABLE
+          }
+        })
+      },
+      searchPageExtrasKey
+    )
   }
 }
 
@@ -74,23 +79,25 @@ export function useBreadcrumbLinksForTopic(
   theme: Ref<string | undefined>,
   subtheme: Ref<string | undefined>,
   topic: Ref<Topic | null>,
-  topicsListAll: boolean | null
+  topicsListAll: boolean | null,
+  searchPageSlug: string,
+  searchPageName: string
 ): ComputedRef<BreadcrumbItem[]> {
   return computed(() => {
     const breadcrumbs = [{ to: '/', text: 'Accueil' }]
     if (topicsListAll === true) {
       breadcrumbs.push({
-        to: `/${topicsSlug}`,
-        text: `${capitalize(topicsName)}s`
+        to: `/${searchPageSlug}`,
+        text: `${capitalize(searchPageName)}s`
       })
     }
 
     if (theme.value !== undefined && subtheme.value !== undefined) {
       breadcrumbs.push(
-        { text: theme.value, to: `/${topicsSlug}/?theme=${theme.value}` },
+        { text: theme.value, to: `/${searchPageSlug}/?theme=${theme.value}` },
         {
           text: subtheme.value,
-          to: `/${topicsSlug}/?theme=${theme.value}&subtheme=${subtheme.value}`
+          to: `/${searchPageName}/?theme=${theme.value}&subtheme=${subtheme.value}`
         }
       )
     }
@@ -103,7 +110,10 @@ export function useBreadcrumbLinksForTopic(
   })
 }
 
-export function useExtras(topic: Ref<Topic | null>): {
+export function useExtras(
+  topic: Ref<Topic | null>,
+  searchPageExtrasKey: SiteId
+): {
   theme: Ref<string | undefined>
   subtheme: Ref<string | undefined>
   datasetsProperties: Ref<DatasetProperties[]>
@@ -117,10 +127,8 @@ export function useExtras(topic: Ref<Topic | null>): {
   watch(
     topic,
     () => {
-      const extras = topic.value?.extras[topicsExtrasKey]
+      const extras = topic.value?.extras[searchPageExtrasKey]
       if (extras != null) {
-        theme.value = topicsUseThemes ? extras.theme : undefined
-        subtheme.value = topicsUseThemes ? extras.subtheme : undefined
         datasetsProperties.value = extras.datasets_properties ?? []
 
         if (extras.cloned_from != null) {

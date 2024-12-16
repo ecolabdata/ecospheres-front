@@ -54,11 +54,11 @@ const clear = () => {
 </script>
 
 <template>
-  <label class="fr-label fr-mt-2v" for="bouquet-select-dataset"
+  <label class="fr-label fr-mt-2v" for="topic-select-dataset"
     >Rechercher une donnée dans data.gouv.fr&nbsp;:</label
   >
   <Multiselect
-    id="bouquet-select-dataset"
+    id="topic-select-dataset"
     ref="multiselect"
     v-model="selectedDataset"
     :options="options"

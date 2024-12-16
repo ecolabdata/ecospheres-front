@@ -81,7 +81,7 @@ const search = useDebounceFn((query) => {
     <h2>Catalogues d'indicateurs</h2>
     <div class="fr-col-md-12 fr-mb-2w">
       <SearchComponent
-        id="search-bouquet"
+        id="search-topic"
         :model-value="props.query"
         :is-filter="true"
         search-label="Rechercher un indicateur"

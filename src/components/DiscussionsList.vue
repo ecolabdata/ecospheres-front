@@ -17,7 +17,7 @@ import LocalStorageService from '@/services/LocalStorageService'
 import { useDiscussionStore } from '@/store/DiscussionStore'
 import { useUserStore } from '@/store/UserStore'
 import { formatDate } from '@/utils'
-import { useTopicsConf } from '@/utils/config'
+import { useSearchPagesConfig } from '@/utils/config'
 
 const route = useRoute()
 const router = useRouter()
@@ -25,7 +25,9 @@ const router = useRouter()
 const discussionStore = useDiscussionStore()
 const userStore = useUserStore()
 
-const { topicsName } = useTopicsConf()
+const { searchPageName } = useSearchPagesConfig(
+  route.path.replace('/admin', '').split('/')[1]
+)
 
 const { loggedIn } = storeToRefs(userStore)
 const currentPage: Ref<number> = ref(1)
@@ -45,7 +47,7 @@ const props = defineProps({
 
 const subjectClassLabels = {
   Dataset: 'jeu de données',
-  Topic: topicsName
+  Topic: searchPageName
 }
 
 const discussionForm: Ref<DiscussionForm> = ref({

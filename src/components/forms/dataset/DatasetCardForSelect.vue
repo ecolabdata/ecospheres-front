@@ -57,7 +57,7 @@ const badgeClasse = computed(() => {
     <DsfrBadge
       v-if="alreadySelected"
       type="info"
-      label="Déjà utilisé dans ce bouquet"
+      label="Déjà utilisé dans ce topic"
       small
       ellipsis
       :class="badgeClasse"

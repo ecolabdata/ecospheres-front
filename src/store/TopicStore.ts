@@ -87,12 +87,13 @@ export const useTopicStore = defineStore('topic', {
     /**
      * Load universe related topics from API
      */
-    async loadTopicsForUniverse(): Promise<Topic[]> {
+    async loadTopicsForUniverse(tags?: string[]): Promise<Topic[]> {
       if (this.isLoaded) return this.data
+      const tagQuery = [config.universe.name, ...(tags ?? [])]
       let response = await topicsAPIv2.list({
         params: {
           page_size: config.website.pagination_sizes.topics_list,
-          tag: config.universe.name,
+          tag: tagQuery,
           include_private: 'yes'
         }
       })

@@ -6,12 +6,10 @@ import type { WithOwned } from '@/model'
 import type { ExtendedUser } from '@/model/user'
 import LocalStorageService from '@/services/LocalStorageService'
 import UserAPI from '@/services/api/resources/UserAPI'
-import { useTopicsConf } from '@/utils/config'
+import { useSearchPagesConfig } from '@/utils/config'
 
 const STORAGE_KEY = 'token'
 const userAPI = new UserAPI()
-const { topicsCanAdd } = useTopicsConf()
-
 export interface RootState {
   isInited: boolean
   isLoggedIn: boolean
@@ -37,17 +35,6 @@ export const useUserStore = defineStore('user', {
     },
     isAdmin(): boolean {
       return this.loggedIn && (this.data?.roles?.includes('admin') ?? false)
-    },
-    canAddBouquet(state): boolean {
-      if (topicsCanAdd.everyone || this.isAdmin) {
-        return true
-      }
-      if (this.loggedIn && state.data != null) {
-        if (topicsCanAdd.authorized_users?.includes(state.data.id)) {
-          return true
-        }
-      }
-      return false
     }
   },
   actions: {
@@ -140,6 +127,18 @@ export const useUserStore = defineStore('user', {
         return this.data.organizations
           .map((o) => o.id)
           .includes(object.organization.id)
+      }
+      return false
+    },
+    canAddTopic(searchPageSlug: string): boolean {
+      const { searchPageCanAdd } = useSearchPagesConfig(searchPageSlug)
+      if (searchPageCanAdd.everyone || this.isAdmin) {
+        return true
+      }
+      if (this.loggedIn && this.data != null) {
+        if (searchPageCanAdd.authorized_users?.includes(this.data.id)) {
+          return true
+        }
       }
       return false
     }

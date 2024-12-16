@@ -10,7 +10,7 @@ universe:
   # "universe" topic id
   topic_id: 65141cd780d73f98142e9265
   # universe name, used as bouquets tag
-  name: ecospheres
+  name: simplifions
 
 robots:
   disallow:
@@ -19,7 +19,7 @@ robots:
 
 # UI customizations
 website:
-  title: 'ecologie.data.gouv.fr'
+  title: 'toto.data.gouv.fr'
   rf_title: 'RÉPUBLIQUE<br>FRANÇAISE'
   service_logo: '/logos/ecospheres-logo.svg'
   badge:
@@ -34,11 +34,11 @@ website:
       width: '40px'
       height: '219px'
   homepage:
-    title:
-    subtitle:
+    title: coucou toto
+    subtitle: subtitle toto
     sections:
-      - title:
-        content:
+      - title: salut toto
+        content: content toto
         sub_section_datasets:
         sub_section_cards:
         sub_section_tiles:
@@ -57,48 +57,86 @@ website:
           route: datasets
         - text: Rechercher {} dans les <strong>bouquets</strong>
           route: bouquets
-      pages:
-        - name: bouquet
-          slug: bouquets
-          type: topics
-          organizations:
-          extras_key: ecospheres
-          add: true
-          labels:
-            search_page_title: Bouquets
-            search_bar_title: Filtrer les bouquets
-            search_results: bouquets disponibles
-            add_button: Ajouter un bouquet
-            add_title: Nouveau bouquet
-            add_subtitle: Description du bouquet de données
-            subject: Sujet du bouquet
-            description_title: Objectif du bouquet
-            description_info: "Renseignez ici les informations nécessaires à la compréhension du bouquet : politique publique et problématique à laquelle il répond, lien vers toute méthodologie de traitement des données, description de l'organisme porteur du projet, etc."
-            owner: Propriétaire du bouquet
-          filters:
-            - labels:
-                name: Thématiques
-                all: Toutes les thématiques
-              second_level:
-                display: true
-                name: Chantier
-                all: Tous les chantiers
-              values:
-                - name: Se loger
-                  values:
-                    - name: test
-                    - name: test2
-                - name: Se produire
-                  values:
-                    - name: test3
-                    - name: test4
-              childs:
-                - name: chantier
-          themes:
-            usage: true
-            main_name: thématique
-            secondary_name: chantier
-        - name:
+    pages:
+      - name: usecases
+        slug: usecases
+        type: topics
+        organizations:
+        extras_key: usecases
+        list_all: true
+        display_metadata: true
+        activate_read_more: true
+        dataset_editorialization: true
+        can_add:
+          everyone: true
+          authorized_users:
+        labels:
+          search_page_title: cas d'usages
+          search_bar_title: Filtrer les cas d'usages
+          search_results: cas disponibles
+          add_button: Ajouter un cas d'usage
+          add_title: Nouveau cas d'usage
+          add_subtitle: Description du cas d'usage
+          subject: Sujet du cas d'usage
+          description_title: Objectif du cas d'usage
+          description_info: "Renseignez ici les informations nécessaires à la compréhension du cas d'usage"
+          owner: Propriétaire du cas d'usage
+        filters:
+          - name: Thematiques
+            tag: theme
+            values:
+              - name: Se loger
+                tag: se-loger
+              - name: Se Nourrir
+                tag: se-nourrir
+          - name: Sous-Thématiques
+            tag: subtheme
+            condition_on: theme
+            values:
+              - name: Test 1
+                tag: test1
+                condition_on: se-loger
+              - name: Test 2
+                tag: test2
+                condition_on: se-loger
+              - name: Test 3
+                tag: test3
+                condition_on: se-nourrir
+              - name: Test 4
+                tag: test4
+                condition_on: se-nourrir
+          - name: Type de structures
+            tag: structure
+            values:
+              - name: Administrations
+                tag: admin
+              - name: Citoyens
+                tag: citizen
+              - name: Entreprises
+                tag: company
+      - name: hackathons
+        slug: hackathons
+        type: topics
+        organizations:
+        extras_key: hackathons
+        list_all: true
+        display_metadata: true
+        activate_read_more: true
+        dataset_editorialization: true
+        can_add:
+          everyone: true
+          authorized_users:
+        labels:
+          search_page_title: hackathons
+          search_bar_title: Filtrer les hackathons
+          search_results: cas disponibles
+          add_button: Ajouter un hackathon
+          add_title: Nouveau hackathon
+          add_subtitle: Description du hackathon
+          subject: Sujet du hackathon
+          description_title: Objectif du hackathon
+          description_info: 'Renseignez ici les informations nécessaires à la compréhension du hackathon'
+          owner: Propriétaire du hackathon
 
   header_search:
     display: true
@@ -147,15 +185,14 @@ website:
       to: /
     - text: Données
       to: /datasets
-    - text: Bouquets
-      to: /bouquets
-    # TODO: enable when ready
-    # - text: Indicateurs
-    #   to: /indicators
     - text: Organisations
       to: /organizations
     - text: A propos
       to: /about
+    - text: Hack
+      to: /hackathons
+    - text: UC
+      to: /usecases
   router:
     disable:
       - topics
@@ -202,22 +239,6 @@ website:
     harvest_backends_quality_warning:
       - CSW-ISO-19139
     show_extended_information_panel: true
-  topics:
-    slug: bouquets
-    name: bouquet
-    extras_key: 'ecospheres'
-    themes:
-      usage: true
-      main_name: thématique
-      secondary_name: chantier
-    # include a list page with all topics
-    list_all: true
-    display_metadata: true
-    activate_read_more: true
-    dataset_editorialization: true
-    can_add_topics:
-      everyone: true
-      authorized_users:
   sitemap:
     - name: Accueil
       path: /

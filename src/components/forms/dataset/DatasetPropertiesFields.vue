@@ -9,11 +9,11 @@ import {
   type PropType,
   type Ref
 } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import { Availability, type DatasetProperties } from '@/model/topic'
 import { useDatasetStore } from '@/store/DatasetStore'
-import { useTopicsConf } from '@/utils/config'
+import { useSearchPagesConfig } from '@/utils/config'
 
 import DatasetPropertiesTextFields from './DatasetPropertiesTextFields.vue'
 import SelectDataset from './SelectDataset.vue'
@@ -32,9 +32,12 @@ defineProps({
   }
 })
 
+const route = useRoute()
 const router = useRouter()
 const datasetStore = useDatasetStore()
-const { topicsDatasetEditorialization } = useTopicsConf()
+const { searchPageDatasetEditorialization } = useSearchPagesConfig(
+  route.path.replace('/admin', '').split('/')[1]
+)
 
 const selectedDataset: Ref<DatasetV2 | undefined> = ref(undefined)
 
@@ -51,7 +54,7 @@ const isValidDataset = computed((): boolean => {
     isValidUrlDataset.value &&
     !datasetProperties.value.remoteDeleted
 
-  if (!topicsDatasetEditorialization) return isValidWithoutEditorialization
+  if (!searchPageDatasetEditorialization) return isValidWithoutEditorialization
 
   return isValidWithoutEditorialization && hasEditorialization.value
 })
@@ -120,7 +123,7 @@ onMounted(() => {
 
 <template>
   <DatasetPropertiesTextFields
-    v-if="topicsDatasetEditorialization"
+    v-if="searchPageDatasetEditorialization"
     v-model:dataset-properties="datasetProperties"
   />
   <div class="fr-mt-1w fr-mb-4w">
@@ -131,7 +134,7 @@ onMounted(() => {
     />
   </div>
   <div
-    v-if="!selectedDataset && topicsDatasetEditorialization"
+    v-if="!selectedDataset && searchPageDatasetEditorialization"
     class="fr-mt-4w"
   >
     <fieldset id="alt-source" class="fr-fieldset">

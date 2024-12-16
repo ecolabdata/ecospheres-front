@@ -1,4 +1,5 @@
 import axios from 'axios'
+import qs from 'qs'
 
 import config from '@/config'
 import type {
@@ -16,7 +17,7 @@ import { toastHttpError } from '@/utils/error'
 
 // build queries like tag=1&tag=2 for arrays instead of tag[]=1&tag[]=2
 axios.defaults.paramsSerializer = {
-  indexes: null
+  serialize: (params) => qs.stringify(params, { arrayFormat: 'repeat' })
 }
 
 /**

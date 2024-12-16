@@ -2,12 +2,13 @@
 import type { DatasetV2 } from '@datagouv/components'
 import { capitalize, computed, onMounted, ref } from 'vue'
 import { useLoading } from 'vue-loading-overlay'
+import { useRoute } from 'vue-router'
 import { toast } from 'vue3-toastify'
 
 import DatasetPropertiesTextFields from '@/components/forms/dataset/DatasetPropertiesTextFields.vue'
 import { Availability, type DatasetProperties } from '@/model/topic'
 import { useTopicStore } from '@/store/TopicStore'
-import { useTopicsConf } from '@/utils/config'
+import { useSearchPagesConfig } from '@/utils/config'
 
 const props = defineProps({
   show: {
@@ -20,14 +21,20 @@ const props = defineProps({
   }
 })
 
+const route = useRoute()
+
 const emit = defineEmits(['update:show'])
 const loader = useLoading()
 const topicStore = useTopicStore()
 
-const { topicsName, topicsExtrasKey, topicsDatasetEditorialization } =
-  useTopicsConf()
+const {
+  searchPageName,
+  searchPageExtrasKey,
+  searchPageDatasetEditorialization,
+  searchPageSlug
+} = useSearchPagesConfig(route.path.replace('/admin', '').split('/')[1])
 
-const bouquets = topicStore.myTopics
+const topics = topicStore.myTopics
 const datasetProperties = ref<DatasetProperties>({
   title: '',
   purpose: '',
@@ -35,26 +42,26 @@ const datasetProperties = ref<DatasetProperties>({
   uri: `/datasets/${props.dataset.id}`,
   availability: Availability.LOCAL_AVAILABLE
 })
-const selectedBouquetId = ref(null)
+const selectedTopicId = ref(null)
 
-const bouquetOptions = computed(() => {
-  return bouquets.value.map((bouquet) => {
+const topicOptions = computed(() => {
+  return topics.value.map((topic) => {
     return {
-      value: bouquet.id,
-      text: bouquet.name
+      value: topic.id,
+      text: topic.name
     }
   })
 })
 
 const isValid = computed(() => {
-  if (topicsDatasetEditorialization) {
+  if (searchPageDatasetEditorialization) {
     return (
       datasetProperties.value.title.trim() !== '' &&
       datasetProperties.value.purpose.trim() !== '' &&
-      !!selectedBouquetId.value
+      !!selectedTopicId.value
     )
   } else {
-    return !!selectedBouquetId.value
+    return !!selectedTopicId.value
   }
 })
 
@@ -73,37 +80,37 @@ const modalActions = computed(() => {
   ]
 })
 
-const isDatasetInBouquet = computed(() => {
-  if (selectedBouquetId.value === null) {
+const isDatasetInTopic = computed(() => {
+  if (selectedTopicId.value === null) {
     return false
   }
-  const selectedBouquet = topicStore.get(selectedBouquetId.value)
+  const selectedTopic = topicStore.get(selectedTopicId.value)
   const datasetsProperties =
-    selectedBouquet?.extras[topicsExtrasKey].datasets_properties
+    selectedTopic?.extras[searchPageExtrasKey].datasets_properties
   return datasetsProperties?.some(
     (datasetProps) => datasetProps.id === props.dataset.id
   )
 })
 
 const submit = async () => {
-  if (selectedBouquetId.value === null) {
+  if (selectedTopicId.value === null) {
     throw Error('Trying to attach to topic without id')
   }
-  const bouquet = topicStore.get(selectedBouquetId.value)
-  if (bouquet === undefined) {
+  const topic = topicStore.get(selectedTopicId.value)
+  if (topic === undefined) {
     throw Error('Topic not in store')
   }
   const newDatasetsProperties =
-    bouquet.extras[topicsExtrasKey].datasets_properties || []
+    topic.extras[searchPageExtrasKey].datasets_properties || []
   newDatasetsProperties.push(datasetProperties.value)
-  bouquet.extras[topicsExtrasKey].datasets_properties = newDatasetsProperties
-  await topicStore.update(bouquet.id, {
-    id: bouquet.id,
-    tags: bouquet.tags,
-    extras: bouquet.extras
+  topic.extras[searchPageExtrasKey].datasets_properties = newDatasetsProperties
+  await topicStore.update(topic.id, {
+    id: topic.id,
+    tags: topic.tags,
+    extras: topic.extras
   })
   toast(
-    `Jeu de données ajouté avec succès au ${topicsName} "${bouquet.name}"`,
+    `Jeu de données ajouté avec succès au ${searchPageName} "${topic.name}"`,
     {
       type: 'success'
     }
@@ -117,7 +124,7 @@ const closeModal = () => {
 
 onMounted(() => {
   const loading = loader.show()
-  topicStore.loadTopicsForUniverse().then(() => loading.hide())
+  topicStore.loadTopicsForUniverse([searchPageSlug]).then(() => loading.hide())
 })
 </script>
 
@@ -125,28 +132,28 @@ onMounted(() => {
   <DsfrModal
     v-if="show"
     size="lg"
-    :title="`Ajouter le jeu de données à un de vos ${topicsName}s`"
+    :title="`Ajouter le jeu de données à un de vos ${searchPageName}s`"
     :opened="show"
     aria-modal="true"
     @close="closeModal"
   >
     <DsfrSelect
-      v-model="selectedBouquetId"
-      :label="`${capitalize(topicsName)} à associer (obligatoire)`"
-      :options="bouquetOptions"
-      :default-unselected-text="`Choisissez un ${topicsName}`"
+      v-model="selectedTopicId"
+      :label="`${capitalize(searchPageName)} à associer (obligatoire)`"
+      :options="topicOptions"
+      :default-unselected-text="`Choisissez un ${searchPageName}`"
     >
     </DsfrSelect>
     <DsfrBadge
-      v-if="isDatasetInBouquet"
+      v-if="isDatasetInTopic"
       type="info"
-      label="Déjà utilisé dans ce bouquet"
+      label="Déjà utilisé dans ce topic"
       small
       ellipsis
       class="fr-mb-2w"
     />
     <DatasetPropertiesTextFields
-      v-if="topicsDatasetEditorialization"
+      v-if="searchPageDatasetEditorialization"
       v-model:dataset-properties="datasetProperties"
     />
     <slot name="footer">

@@ -1,38 +1,39 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { storeToRefs } from 'pinia'
 import { capitalize, computed, inject, ref, watch, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import GenericContainer from '@/components/GenericContainer.vue'
-import BouquetList from '@/components/bouquets/BouquetList.vue'
-import BouquetSearch from '@/components/bouquets/BouquetSearch.vue'
+import TopicList from '@/components/topics/TopicList.vue'
+import TopicSearch from '@/components/topics/TopicSearch.vue'
 import type { BreadcrumbItem } from '@/model/breadcrumb'
 import {
   AccessibilityPropertiesKey,
   type AccessibilityPropertiesType
 } from '@/model/injectionKeys'
-import { NoOptionSelected } from '@/model/theme'
 import { useUserStore } from '@/store/UserStore'
-import { useTopicsConf } from '@/utils/config'
-
-const { topicsSlug, topicsName } = useTopicsConf()
+import { useSearchPagesConfig } from '@/utils/config'
 
 const router = useRouter()
 const route = useRoute()
+
+const searchPageName = ref<string>('')
+const searchPageSlug = ref<string>('')
+const searchPageLabelTitle = ref<string>('')
+const searchPageLabelAddButton = ref<string>('')
+
+const config = useSearchPagesConfig(
+  route.path.replace('/admin', '').split('/')[1]
+)
+searchPageName.value = config.searchPageName
+searchPageSlug.value = config.searchPageSlug
+searchPageLabelTitle.value = config.searchPageLabelTitle
+searchPageLabelAddButton.value = config.searchPageLabelAddButton
 
 const props = defineProps({
   query: {
     type: String,
     default: ''
-  },
-  theme: {
-    type: String,
-    default: NoOptionSelected
-  },
-  subtheme: {
-    type: String,
-    default: NoOptionSelected
   },
   geozone: {
     type: String,
@@ -44,15 +45,12 @@ const props = defineProps({
   }
 })
 
-const selectedTheme = ref(NoOptionSelected)
-const selectedSubtheme = ref(NoOptionSelected)
 const selectedGeozone: Ref<string | null> = ref(null)
 const selectedQuery = ref('')
 const showDrafts = ref(false)
-const bouquetListComp = ref<InstanceType<typeof BouquetList> | null>(null)
+const topicListComp = ref<InstanceType<typeof TopicList> | null>(null)
 
 const userStore = useUserStore()
-const { canAddBouquet } = storeToRefs(userStore)
 
 const setAccessibilityProperties = inject(
   AccessibilityPropertiesKey
@@ -61,24 +59,15 @@ const setAccessibilityProperties = inject(
 const breadcrumbList = computed(() => {
   const links: BreadcrumbItem[] = []
   links.push({ text: 'Accueil', to: '/' })
-  links.push({ text: `${capitalize(topicsName)}s`, to: `/${topicsSlug}` })
-  if (selectedTheme.value !== NoOptionSelected && selectedTheme.value !== '') {
-    links.push({
-      text: selectedTheme.value,
-      to: `/${topicsSlug}?theme=${selectedTheme.value}&subtheme=${NoOptionSelected}`
-    })
-    if (
-      selectedSubtheme.value !== NoOptionSelected &&
-      selectedSubtheme.value !== ''
-    ) {
-      links.push({ text: selectedSubtheme.value })
-    }
-  }
+  links.push({
+    text: `${capitalize(searchPageLabelTitle.value)}`,
+    to: `/${searchPageSlug.value}`
+  })
   return links
 })
 
 const createUrl = computed(() => {
-  return { name: `${topicsSlug}_add`, query: route.query }
+  return { name: `${searchPageSlug.value}_add`, query: route.query }
 })
 
 const pageTitle = computed(() => {
@@ -89,7 +78,7 @@ const pageTitle = computed(() => {
 })
 
 const searchResultsMessage = computed(() => {
-  return bouquetListComp.value ? bouquetListComp.value.numberOfResultMsg : ''
+  return topicListComp.value ? topicListComp.value.numberOfResultMsg : ''
 })
 
 const setLiveResults = () => {
@@ -108,7 +97,7 @@ const setLiveResults = () => {
 const search = useDebounceFn(() => {
   router
     .push({
-      name: topicsSlug,
+      name: searchPageSlug.value,
       query: { ...route.query, q: selectedQuery.value }
     })
     .then(() => {
@@ -119,13 +108,26 @@ const search = useDebounceFn(() => {
 watch(
   props,
   () => {
-    selectedTheme.value = props.theme
-    selectedSubtheme.value = props.subtheme
     selectedGeozone.value = props.geozone
     selectedQuery.value = props.query
     showDrafts.value = props.drafts === '1'
   },
   { immediate: true }
+)
+
+watch(
+  () => route.fullPath,
+  () => {
+    const config = useSearchPagesConfig(
+      route.path.replace('/admin', '').split('/')[1]
+    )
+    if (config) {
+      searchPageName.value = config.searchPageName
+      searchPageSlug.value = config.searchPageSlug
+      searchPageLabelTitle.value = config.searchPageLabelTitle
+      searchPageLabelAddButton.value = config.searchPageLabelAddButton
+    }
+  }
 )
 </script>
 
@@ -137,25 +139,27 @@ watch(
     <div
       class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle justify-between fr-pb-1w"
     >
-      <h1 class="fr-col-auto fr-mb-2v">{{ capitalize(topicsName) }}s</h1>
+      <h1 class="fr-col-auto fr-mb-2v">
+        {{ capitalize(searchPageLabelTitle) }}
+      </h1>
       <div
-        v-if="canAddBouquet"
+        v-if="userStore.canAddTopic(searchPageSlug)"
         class="fr-col-auto fr-grid-row fr-grid-row--middle"
       >
         <router-link :to="createUrl" class="fr-btn fr-mb-1w">
           <VIcon name="ri-add-circle-line" class="fr-mr-1v" />
-          Ajouter un {{ topicsName }}
+          {{ searchPageLabelAddButton }}
         </router-link>
       </div>
     </div>
     <div class="fr-col-md-12 fr-mb-2w">
       <SearchComponent
-        id="search-bouquet"
+        id="search-topic"
         v-model="selectedQuery"
         :is-filter="true"
-        :search-label="`Filtrer les ${topicsName}s`"
-        :label="`Filtrer les ${topicsName}s`"
-        :search-endpoint="router.resolve({ name: 'bouquets' }).href"
+        :search-label="`Filtrer les ${searchPageLabelTitle}`"
+        :label="`Filtrer les ${searchPageLabelTitle}`"
+        :search-endpoint="router.resolve({ name: searchPageName }).href"
         @update:model-value="search"
       />
     </div>
@@ -169,9 +173,7 @@ watch(
             <h2 id="fr-sidemenu-title" className="fr-sidemenu__title h3">
               Filtres
             </h2>
-            <BouquetSearch
-              :theme-name="selectedTheme"
-              :subtheme-name="selectedSubtheme"
+            <TopicSearch
               :geozone="selectedGeozone"
               :show-drafts="showDrafts"
               @vue:updated="setLiveResults"
@@ -179,10 +181,8 @@ watch(
           </div>
         </nav>
         <div className="fr-col-12 fr-col-md-8">
-          <BouquetList
-            ref="bouquetListComp"
-            :theme-name="selectedTheme"
-            :subtheme-name="selectedSubtheme"
+          <TopicList
+            ref="topicListComp"
             :show-drafts="showDrafts"
             :geozone="geozone"
             :query="selectedQuery"

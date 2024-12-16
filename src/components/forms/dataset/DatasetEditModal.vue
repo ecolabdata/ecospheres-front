@@ -133,7 +133,7 @@ defineExpose({ addDataset, editDataset })
   <DsfrModal
     v-if="isModalOpen && modalData.dataset"
     size="lg"
-    class="bouquet-dataset-modal"
+    class="topic-dataset-modal"
     :title="
       modalData.mode === 'edit'
         ? 'Éditer le jeu de données'

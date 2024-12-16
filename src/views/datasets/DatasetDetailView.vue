@@ -10,14 +10,13 @@ import {
   Well,
   type License
 } from '@datagouv/components'
-import { storeToRefs } from 'pinia'
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useLoading } from 'vue-loading-overlay'
 
 import DiscussionsList from '@/components/DiscussionsList.vue'
 import GenericContainer from '@/components/GenericContainer.vue'
 import ReusesList from '@/components/ReusesList.vue'
-import DatasetAddToBouquetModal from '@/components/datasets/DatasetAddToBouquetModal.vue'
+import DatasetAddToTopicModal from '@/components/datasets/DatasetAddToTopicModal.vue'
 import ExtendedInformationPanel from '@/components/datasets/ExtendedInformationPanel.vue'
 import config from '@/config'
 import {
@@ -30,7 +29,7 @@ import { useDatasetStore } from '@/store/DatasetStore'
 import { useResourceStore } from '@/store/ResourceStore'
 import { useUserStore } from '@/store/UserStore'
 import { descriptionFromMarkdown, formatDate } from '@/utils'
-import { useTopicsConf } from '@/utils/config'
+import { useSearchPagesConfig } from '@/utils/config'
 
 const route = useRouteParamsAsString()
 const datasetId = route.params.did
@@ -38,18 +37,20 @@ const datasetId = route.params.did
 const datasetStore = useDatasetStore()
 const resourceStore = useResourceStore()
 const userStore = useUserStore()
-const { canAddBouquet } = storeToRefs(userStore)
 
 const dataset = computed(() => datasetStore.get(datasetId))
 
 const resources = ref<Record<string, ResourceDataWithQuery>>({})
 const selectedTabIndex = ref(0)
 const license = ref<License>()
-const showAddToBouquetModal = ref(false)
+const showAddToTopicModal = ref(false)
 
 const pageSize = config.website.pagination_sizes.files_list as number
 const showDiscussions = config.website.discussions.dataset.display as boolean
-const { topicsName } = useTopicsConf()
+
+const { searchPageName, searchPageSlug } = useSearchPagesConfig(
+  route.path.replace('/admin', '').split('/')[1]
+)
 
 const setAccessibilityProperties = inject(
   AccessibilityPropertiesKey
@@ -264,21 +265,21 @@ watch(
         </div>
         <div
           v-if="
-            config.website.datasets.add_to_bouquet &&
+            config.website.datasets.add_to_topic &&
             userStore.loggedIn &&
-            canAddBouquet
+            userStore.canAddTopic(searchPageSlug)
           "
         >
           <DsfrButton
             class="fr-mt-2w"
             size="md"
-            :label="`Ajouter à un ${topicsName}`"
+            :label="`Ajouter à un ${searchPageName}`"
             icon="ri-file-add-line"
-            @click="showAddToBouquetModal = true"
+            @click="showAddToTopicModal = true"
           />
-          <DatasetAddToBouquetModal
-            v-if="showAddToBouquetModal"
-            v-model:show="showAddToBouquetModal"
+          <DatasetAddToTopicModal
+            v-if="showAddToTopicModal"
+            v-model:show="showAddToTopicModal"
             :dataset="dataset"
           />
         </div>
