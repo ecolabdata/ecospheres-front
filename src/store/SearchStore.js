@@ -28,7 +28,7 @@ export const useSearchStore = defineStore('search', {
       ].map((page) => {
         page += 1
         return {
-          label: page,
+          label: page.toString(),
           href: '#',
           title: `Page ${page}`
         }

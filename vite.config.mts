@@ -34,7 +34,13 @@ export default defineConfig(({ mode }) => {
   return {
     base: '/',
     plugins: [
-      vue(),
+      vue({
+        template: {
+          compilerOptions: {
+            isCustomElement: (tag) => ['search'].includes(tag)
+          }
+        }
+      }),
       vueDevTools(),
       AutoImport({
         include: [/\.[tj]sx?$/, /\.vue$/, /\.vue\?vue/],

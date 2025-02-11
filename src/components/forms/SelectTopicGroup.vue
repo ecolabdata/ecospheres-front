@@ -26,6 +26,10 @@ defineProps({
   required: {
     type: Boolean,
     default: false
+  },
+  isErrored: {
+    type: Boolean,
+    defautl: false
   }
 })
 
@@ -44,7 +48,7 @@ const trimGroupName = (groupName: string) => {
 </script>
 
 <template>
-  <label for="regroupement-input">
+  <label for="input-group">
     {{ label }}
     (<span v-if="required">obligatoire</span><span v-else>facultatif</span>)
   </label>
@@ -56,7 +60,7 @@ const trimGroupName = (groupName: string) => {
     {{ description }}
   </p>
   <Multiselect
-    id="regroupement-input"
+    id="input-group"
     v-model="datasetProperties.group"
     role="search"
     :options="groupOptions"
@@ -68,11 +72,12 @@ const trimGroupName = (groupName: string) => {
     :create-option="true"
     placeholder=""
     :aria="{
-      'aria-describedby': 'regroupement-description',
+      'aria-describedby': 'errors-group regroupement-description',
       // useless or unsupported https://github.com/vueform/multiselect/issues/436
       'aria-labelledby': null,
       'aria-multiselectable': null,
-      'aria-placeholder': null
+      'aria-placeholder': null,
+      'aria-invalid': `${!!$slots.errorGroup}`
     }"
     @select="trimGroupName"
   >
@@ -96,4 +101,7 @@ const trimGroupName = (groupName: string) => {
       </button>
     </template>
   </Multiselect>
+  <p v-if="$slots.errorGroup" id="errors-group" class="error">
+    <VIconCustom name="error-fill" />&nbsp;<slot name="errorGroup" />
+  </p>
 </template>

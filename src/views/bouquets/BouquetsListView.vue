@@ -169,7 +169,6 @@ watch(
         v-model="selectedQuery"
         :is-filter="true"
         :search-label="`Filtrer les ${topicsName}s`"
-        :label="`Filtrer les ${topicsName}s`"
         :search-endpoint="router.resolve({ name: topicsSlug }).href"
         @update:model-value="search"
       />

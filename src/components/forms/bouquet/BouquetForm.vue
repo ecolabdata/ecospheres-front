@@ -119,6 +119,7 @@ onMounted(() => {
   <!-- Title -->
   <div class="fr-input-group">
     <DsfrInput
+      id="input-name"
       v-model="name"
       v-bind="nameAttrs"
       :label="`Sujet du ${topicsName} (obligatoire)`"
@@ -134,6 +135,7 @@ onMounted(() => {
   <!-- Description -->
   <div class="fr-input-group">
     <DsfrInput
+      id="input-description"
       v-model="description"
       v-bind="descriptionAttrs"
       is-textarea

@@ -49,16 +49,41 @@ const bouquetOptions = computed(() => {
   })
 })
 
+const inputErrorMessages = new Map([
+  ['bouquetId', `Veuillez sélectionner un ${topicsName}.`],
+  ['group', `Le groupe est limité à 100 caractères.`],
+  ['title', 'Veuillez renseigner un libellé.'],
+  ['purpose', "La raison d'utilisation ne doit pas être vide."]
+])
+const formErrors: Ref<string[]> = ref([])
+
+const validateFields = () => {
+  if (!datasetProperties.value.title.trim()) {
+    formErrors.value.push('title')
+  }
+  if (!datasetProperties.value.purpose.trim()) {
+    formErrors.value.push('purpose')
+  }
+  if (!selectedBouquetId.value) {
+    formErrors.value.push('bouquetId')
+  }
+  if (
+    datasetProperties.value.group &&
+    datasetProperties.value.group.trim().length > 100
+  ) {
+    formErrors.value.push('group')
+  }
+}
+
+const sortedinputErrors = computed(() =>
+  Array.from(inputErrorMessages.keys()).filter((key) =>
+    formErrors.value.includes(key)
+  )
+)
+
 const isValid = computed(() => {
   if (topicsDatasetEditorialization) {
-    return (
-      !!datasetProperties.value.title.trim() &&
-      !!datasetProperties.value.purpose.trim() &&
-      !!selectedBouquetId.value &&
-      (datasetProperties.value.group
-        ? datasetProperties.value.group.trim().length < 100
-        : true)
-    )
+    return !formErrors.value.length
   } else {
     return !!selectedBouquetId.value
   }
@@ -73,11 +98,28 @@ const modalActions = computed(() => {
     },
     {
       label: 'Enregistrer',
-      disabled: !isValid.value,
-      onClick: () => submit()
+      onClick: () => onSubmit()
     }
   ]
 })
+
+const errorStatus = useTemplateRef('errorStatus')
+const isSubmitted: Ref<boolean> = ref(false)
+
+const onSubmit = () => {
+  // reset error fields
+  formErrors.value = []
+  isSubmitted.value = true
+
+  validateFields()
+
+  if (formErrors.value.length > 0) {
+    errorStatus.value?.focus()
+  } else if (isValid.value) {
+    isSubmitted.value = false
+    submit()
+  }
+}
 
 const selectedBouquet = computed(() => {
   if (selectedBouquetId.value === null) {
@@ -142,15 +184,51 @@ onMounted(() => {
     :title="`Ajouter le jeu de données à un de vos ${topicsName}s`"
     :opened="show"
     aria-modal="true"
+    class="form"
     @close="closeModal"
   >
+    <div
+      v-show="formErrors.length"
+      class="fr-my-4w fr-p-2w error-status"
+      role="group"
+      aria-labelledby="error-summary-title"
+    >
+      <h3 id="error-summary-title" ref="errorStatus" tabindex="-1">
+        Il y a {{ sortedinputErrors.length }} erreur<span
+          v-if="formErrors.length > 1"
+          >s</span
+        >
+        de saisie dans le formulaire.
+      </h3>
+      <ol>
+        <li
+          v-for="(error, index) in sortedinputErrors"
+          :key="index"
+          class="error"
+        >
+          <a :href="`#input-${error}`">{{ inputErrorMessages.get(error) }}</a>
+        </li>
+      </ol>
+    </div>
     <DsfrSelect
+      id="input-bouquetId"
       v-model="selectedBouquetId"
       :label="`${capitalize(topicsName)} à associer (obligatoire)`"
       :options="bouquetOptions"
       :default-unselected-text="`Choisissez un ${topicsName}`"
+      :aria-invalid="
+        formErrors.includes('bouquetId') && isSubmitted ? true : undefined
+      "
+      aria-describedby="errors-bouquetId"
+    />
+    <p
+      v-if="formErrors.includes('bouquetId')"
+      id="errors-bouquetId"
+      class="error"
     >
-    </DsfrSelect>
+      <VIconCustom name="error-fill" />
+      {{ inputErrorMessages.get('bouquetId') }}
+    </p>
     <DsfrBadge
       v-if="isDatasetInBouquet"
       type="info"
@@ -161,16 +239,29 @@ onMounted(() => {
     />
     <div class="fr-input-group">
       <SelectTopicGroup
+        id="input-group"
         v-model:properties-model="datasetProperties"
         v-model:groups-model="datasetsGroups"
         label="Regroupement"
         description="Rechercher ou créer un regroupement (100 caractères maximum). Un regroupement contient un ou plusieurs jeux de données."
-      />
+      >
+        <template v-if="formErrors.includes('group')" #errorGroup>
+          {{ inputErrorMessages.get('group') }}
+        </template>
+      </SelectTopicGroup>
     </div>
     <DatasetPropertiesTextFields
       v-if="topicsDatasetEditorialization"
       v-model:dataset-properties-model="datasetProperties"
-    />
+    >
+      <template v-if="formErrors.includes('title')" #errorTitle>
+        {{ inputErrorMessages.get('title') }}
+      </template>
+      <template v-if="formErrors.includes('purpose')" #errorPurpose>
+        {{ inputErrorMessages.get('purpose') }}
+      </template>
+    </DatasetPropertiesTextFields>
+
     <slot name="footer">
       <DsfrButtonGroup
         v-if="modalActions?.length"
@@ -185,5 +276,8 @@ onMounted(() => {
 <style scoped>
 .fr-select-group:has(+ .fr-badge) {
   margin-bottom: 0.5rem;
+}
+:deep(.fr-select-group:has(+ #errors-name)) {
+  margin-bottom: 0;
 }
 </style>
