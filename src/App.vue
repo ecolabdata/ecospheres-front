@@ -65,14 +65,11 @@ onMounted(() => {
   userStore.init()
 })
 
-const logotext = config.website.rf_title
-const servicetitle = config.website.title
-const logoOperator = config.website.logo_operator?.src
-const showLogoOperatorInHeader = config.website.logo_operator?.show_in_header
 const logoService = config.website.service_logo
-const showBadge = config.website.badge.display
-const badgeText = config.website.badge.text
-const badgeStyle = config.website.badge.style
+const logoText = config.website.rf_title
+const logoOperator = config.website.logo_operator?.src
+const logoOperatorHeight = config.website.logo_operator?.header?.height
+const logoOperatorWidth = config.website.logo_operator?.header?.width
 const footerPhrase = config.website.footer_phrase
 const footerExternalLinks = config.website.footer_external_links
 const footerMandatoryLinks = config.website.footer_mandatory_links
@@ -127,28 +124,12 @@ watch(
     <div v-html="noticeContent"></div>
   </DsfrNotice>
   <HeaderComponent
-    :service-title="servicetitle"
-    service-description=""
-    home-to="/"
     :user-name="userName"
     :quick-links="quickLinks"
-    :show-search="config.website.header_search.display"
-    :logo-text="logotext"
-    :operator-img-src="logoOperator"
-    :show-operator-logo="showLogoOperatorInHeader"
-    :operator-img-style="{
-      height: config.website.logo_operator?.header?.width,
-      width: config.website.logo_operator?.header?.height
-    }"
-    :service-logo-src="logoService"
-    :show-badge="showBadge"
-    :badge-text="badgeText"
-    :badge-style="badgeStyle"
-  >
-    <template #mainnav="{ hidemodal }">
-      <Navigation :on-click="hidemodal" />
-    </template>
-  </HeaderComponent>
+    :logo-operator-height
+    :logo-operator-width
+    :custom-search="true"
+  />
 
   <main id="main-content" role="main">
     <RouterView />
@@ -156,11 +137,11 @@ watch(
 
   <DsfrFooter
     class="fr-mt-16w"
-    :logo-text="logotext"
+    :logo-text="logoText"
     :operator-img-src="logoOperator"
     :operator-img-style="{
-      height: config.website.logo_operator?.footer?.width,
-      width: config.website.logo_operator?.footer?.height
+      height: logoOperatorHeight,
+      width: logoOperatorWidth
     }"
     :service-logo-src="logoService"
     :desc-text="footerPhrase"
