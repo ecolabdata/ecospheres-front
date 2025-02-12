@@ -68,7 +68,7 @@ const discussions: ComputedRef<DiscussionResponse | undefined> = computed(
     )
   }
 )
-const pages: ComputedRef<object[]> = computed(() => {
+const pages = computed(() => {
   return discussionStore.getDiscussionsPaginationForSubject(props.subject.id)
 })
 

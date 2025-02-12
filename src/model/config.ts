@@ -37,3 +37,26 @@ export interface MenuConfig {
   text: string
   to: string
 }
+
+export interface FilterItemValueConf {
+  id: string
+  name: string
+  parent?: string
+}
+
+export interface FilterItemConf {
+  name: string
+  id: string
+  child?: string
+  color: string
+  values: FilterItemValueConf[]
+}
+
+export type Filters = 'bouquets' | 'indicators'
+
+export type FiltersConf = {
+  [K in Filters]: {
+    tag_prefix: string
+    items: FilterItemConf[]
+  }
+}

@@ -10,6 +10,7 @@ import DiscussionsList from '@/components/DiscussionsList.vue'
 import GenericContainer from '@/components/GenericContainer.vue'
 import OrganizationLogo from '@/components/OrganizationLogo.vue'
 import ReusesList from '@/components/ReusesList.vue'
+import TagComponent from '@/components/TagComponent.vue'
 import BouquetDatasetList from '@/components/bouquets/BouquetDatasetList.vue'
 import BouquetDatasetListExport from '@/components/bouquets/BouquetDatasetListExport.vue'
 import config from '@/config'
@@ -29,7 +30,7 @@ import {
 } from '@/utils/bouquet'
 import { useTopicsConf } from '@/utils/config'
 import { useSpatialCoverage } from '@/utils/spatial'
-import { useThemeOptions } from '@/utils/theme'
+import { useTag } from '@/utils/tags'
 
 const props = defineProps({
   bouquetId: {
@@ -66,7 +67,9 @@ const {
   topicsName
 } = useTopicsConf()
 
-const { datasetsProperties, clonedFrom, theme, subtheme } = useExtras(topic)
+const { datasetsProperties, clonedFrom } = useExtras(topic)
+const theme = useTag('bouquets', topic, 'theme')
+const subtheme = useTag('bouquets', topic, 'subtheme')
 
 const breadcrumbLinks = useBreadcrumbLinksForTopic(
   theme,
@@ -74,8 +77,6 @@ const breadcrumbLinks = useBreadcrumbLinksForTopic(
   topic,
   topicsListAll
 )
-
-const { themeColors } = useThemeOptions(theme)
 
 const tabTitles = [
   { title: 'Données', tabId: 'tab-0', panelId: 'tab-content-0' },
@@ -202,7 +203,7 @@ watch(
       >
         <div class="bouquet__header fr-mb-4v">
           <h1 class="fr-mb-1v fr-mr-2v">{{ topic.name }}</h1>
-          <DsfrTag v-if="theme" class="fr-mb-1v card__tag" :label="subtheme" />
+          <TagComponent :tag="subtheme" />
         </div>
         <div v-if="topicsActivateReadMore">
           <ReadMore max-height="600">
@@ -369,10 +370,6 @@ watch(
 }
 .owner-avatar {
   margin-bottom: -6px;
-}
-.card__tag {
-  color: v-bind('themeColors.color');
-  background-color: v-bind('themeColors.background');
 }
 /*
 FIXME: magic calc to fix the tabs height bug https://github.com/opendatateam/udata-front-kit/pull/621#issuecomment-2551404580

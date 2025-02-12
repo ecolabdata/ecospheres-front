@@ -5,12 +5,12 @@ import { useLoading } from 'vue-loading-overlay'
 import { toast } from 'vue3-toastify'
 
 import DatasetPropertiesTextFields from '@/components/forms/dataset/DatasetPropertiesTextFields.vue'
+import type { Topic } from '@/model/topic'
 import { Availability, type DatasetProperties } from '@/model/topic'
 import { useTopicStore } from '@/store/TopicStore'
-import { useTopicsConf } from '@/utils/config'
-
 import { useExtras } from '@/utils/bouquet'
 import { useGroups } from '@/utils/bouquetGroups'
+import { useTopicsConf } from '@/utils/config'
 
 const props = defineProps({
   show: {
@@ -79,11 +79,13 @@ const modalActions = computed(() => {
   ]
 })
 
-const selectedBouquet = computed(() => {
+const selectedBouquet: Ref<Topic | null> = ref(null)
+
+watch(selectedBouquetId, async () => {
   if (selectedBouquetId.value === null) {
     return null
   }
-  return topicStore.get(selectedBouquetId.value)
+  selectedBouquet.value = await topicStore.load(selectedBouquetId.value)
 })
 
 const { datasetsProperties } = useExtras(selectedBouquet)
@@ -100,24 +102,21 @@ const isDatasetInBouquet = computed(() => {
 const { groupedDatasets: datasetsGroups } = useGroups(datasetsProperties)
 
 const submit = async () => {
-  if (selectedBouquetId.value === null) {
+  if (selectedBouquetId.value === null || selectedBouquet.value === null) {
     throw Error('Trying to attach to topic without id')
   }
-  const bouquet = topicStore.get(selectedBouquetId.value)
-  if (bouquet === undefined) {
-    throw Error('Topic not in store')
-  }
   const newDatasetsProperties =
-    bouquet.extras[topicsExtrasKey].datasets_properties || []
+    selectedBouquet.value.extras[topicsExtrasKey].datasets_properties || []
   newDatasetsProperties.push(datasetProperties.value)
-  bouquet.extras[topicsExtrasKey].datasets_properties = newDatasetsProperties
-  await topicStore.update(bouquet.id, {
-    id: bouquet.id,
-    tags: bouquet.tags,
-    extras: bouquet.extras
+  selectedBouquet.value.extras[topicsExtrasKey].datasets_properties =
+    newDatasetsProperties
+  await topicStore.update(selectedBouquet.value.id, {
+    id: selectedBouquet.value.id,
+    tags: selectedBouquet.value.tags,
+    extras: selectedBouquet.value.extras
   })
   toast(
-    `Jeu de données ajouté avec succès au ${topicsName} "${bouquet.name}"`,
+    `Jeu de données ajouté avec succès au ${topicsName} "${selectedBouquet.value.name}"`,
     {
       type: 'success'
     }

@@ -91,14 +91,14 @@ export const useDiscussionStore = defineStore('discussion', {
     /**
      * Get a discussions pagination object for a given dataset, from store infos
      */
-    getDiscussionsPaginationForSubject(subjectId: SubjectId): object[] {
+    getDiscussionsPaginationForSubject(subjectId: SubjectId) {
       const discussions = this.getDiscussionsForSubject(subjectId)
       if (discussions === undefined) return []
       const nbPages = Math.ceil(discussions.total / discussions.page_size)
       return [...Array(nbPages).keys()].map((page) => {
         page += 1
         return {
-          label: page,
+          label: page.toString(),
           href: '#',
           title: `Page ${page}`
         }

@@ -1,5 +1,10 @@
 import config from '@/config'
-import type { CanAddTopicsConf, TopicsConf } from '@/model/config'
+import type {
+  CanAddTopicsConf,
+  Filters,
+  FiltersConf,
+  TopicsConf
+} from '@/model/config'
 import type { SiteId } from '@/model/topic'
 
 interface TopicsConfNormalized {
@@ -37,3 +42,8 @@ export const useTopicsConf = (): TopicsConfNormalized => {
 
 // Get debounce value or set default.
 export const debounceWait: number = config.website.default_debounce_wait ?? 600
+
+export const useFiltersConf = (objectType: Filters) => {
+  const filtersConf: FiltersConf = config.filters
+  return filtersConf[objectType]
+}

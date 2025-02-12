@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import SelectComponent from '@/custom/ecospheres/components/SelectComponent.vue'
+import SelectComponent from '@/components/SelectComponent.vue'
 import type { SpatialCoverageLevel } from '@/model/spatial'
 import { useSpatialStore } from '@/store/SpatialStore'
 

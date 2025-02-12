@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue'
-import type { ComputedRef } from 'vue'
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 
 import SearchComponent from '@/components/SearchComponent.vue'
 import BouquetCard from '@/components/bouquets/BouquetCard.vue'
 import config from '@/config'
 import HomeFaq from '@/custom/ecospheres/components/HomeFaq.vue'
-import type { Topic } from '@/model/topic'
 
 import { useTopicStore } from '@/store/TopicStore'
+import { storeToRefs } from 'pinia'
 
 const topicStore = useTopicStore()
-const lastTopics: ComputedRef<Topic[]> = computed(() =>
-  topicStore.sorted.filter((bouquet) => !bouquet.private).slice(0, 3)
-)
+const { topics } = storeToRefs(topicStore)
 
-onMounted(() => topicStore.loadTopicsForUniverse())
+onMounted(() => topicStore.query({ page_size: '3' }))
 
 useHead({
   meta: [
@@ -198,7 +195,7 @@ const dropdown = config.website.header_search.dropdown
       <div class="fr-container">
         <h2>Les bouquets à découvrir</h2>
         <ul class="fr-grid-row discover fr-mb-2w" role="list">
-          <li v-for="topic in lastTopics" :key="topic.id">
+          <li v-for="topic in topics" :key="topic.id">
             <BouquetCard :bouquet="topic" :hide-description="true" />
           </li>
         </ul>
