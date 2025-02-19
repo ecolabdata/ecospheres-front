@@ -3,6 +3,8 @@ import type { DatasetV2 } from '@datagouv/components'
 import { DatasetCard } from '@datagouv/components'
 import { toRef } from 'vue'
 
+import IndicatorDatasetCard from '@/custom/ecospheres/components/indicators/IndicatorDatasetCard.vue'
+import { isIndicator } from '@/custom/ecospheres/utils/indicator'
 import { type DatasetProperties } from '@/model/topic'
 
 const props = defineProps({
@@ -18,12 +20,13 @@ const props = defineProps({
 })
 
 const datasetPropertiesRef = toRef(props, 'datasetProperties')
+const datasetIsIndicator = isIndicator(toRef(props, 'datasetContent'))
 </script>
 
 <template>
   <!-- Using :key ensures that the component is recreated when dataset changes otherwise, we have a persistence on the thumbnail -->
   <DatasetCard
-    v-if="datasetContent"
+    v-if="datasetContent && !datasetIsIndicator"
     :key="datasetContent.id"
     :dataset="datasetContent"
     :dataset-url="{
@@ -31,6 +34,12 @@ const datasetPropertiesRef = toRef(props, 'datasetProperties')
       params: { did: datasetContent.id }
     }"
     :show-description="false"
+    class="dataset-card fr-m-0"
+  />
+  <IndicatorDatasetCard
+    v-if="datasetContent && datasetIsIndicator"
+    :key="datasetContent.id"
+    :dataset="datasetContent"
     class="dataset-card fr-m-0"
   />
   <DsfrAlert

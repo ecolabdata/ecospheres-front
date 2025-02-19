@@ -1,18 +1,15 @@
 <script setup lang="ts">
-// FIXME
-import type { DatasetV2Fix } from '@/model/DatasetV2Fix'
-import {
-  OrganizationNameWithCertificate,
-  useOwnerName
-} from '@datagouv/components'
+import type { DatasetV2 } from '@datagouv/components'
+import { OrganizationNameWithCertificate } from '@datagouv/components'
 import { computed } from 'vue'
 
 import { stripFromMarkdown } from '@/utils'
 import { getOwnerAvatar } from '@/utils/avatar'
+import { useOwnerName } from '@/utils/dataset'
 
 const props = defineProps({
   dataset: {
-    type: Object as () => DatasetV2Fix,
+    type: Object as () => DatasetV2,
     required: true
   },
   alreadySelected: {
