@@ -78,6 +78,7 @@ const discussionWellTitle = showDiscussions
 const discussionWellDescription = showDiscussions
   ? 'Vous avez une question sur ce jeu de données ? Rendez-vous sur data.gouv.fr pour participer aux discussions.'
   : 'Vous avez une question sur ce jeu de données ? Rendez-vous sur data.gouv.fr pour voir les discussions.'
+const NOT_AVAILABLE_DATE = 'non disponible'
 
 const openDataGouvDiscussions = () =>
   window.open(`${dataset.value?.page}#/discussions`, 'datagouv-discussion')
@@ -141,8 +142,32 @@ onMounted(() => {
             </p>
           </div>
         </div>
-        <h2 class="subtitle fr-mt-3v fr-mb-1v">Dernière mise à jour</h2>
-        <p>{{ formatDate(dataset.last_update) }}</p>
+        <template v-if="dataset.harvest">
+          <h2 class="subtitle fr-mt-3v fr-mb-1v">Publication</h2>
+          <p>
+            {{
+              dataset.harvest.created_at
+                ? formatDate(dataset.harvest.created_at)
+                : NOT_AVAILABLE_DATE
+            }}
+          </p>
+
+          <h2 class="subtitle fr-mt-3v fr-mb-1v">Dernière révision</h2>
+          <p>
+            {{
+              dataset.harvest.modified_at
+                ? formatDate(dataset.harvest.modified_at)
+                : NOT_AVAILABLE_DATE
+            }}
+          </p>
+        </template>
+        <template v-else>
+          <h2 class="subtitle fr-mt-3v fr-mb-1v">Création</h2>
+          <p>{{ formatDate(dataset.created_at) }}</p>
+
+          <h2 class="subtitle fr-mt-3v fr-mb-1v">Dernière mise à jour</h2>
+          <p>{{ formatDate(dataset.last_update) }}</p>
+        </template>
         <div v-if="license">
           <h2 class="subtitle fr-mt-3v fr-mb-1v">Licence</h2>
           <p class="fr-text--sm fr-mt-0 fr-mb-3v">
