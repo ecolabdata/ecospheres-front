@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import type { DatasetV2 } from '@datagouv/components'
 import { DatasetCard } from '@datagouv/components'
-import type { DatasetV2 } from '@datagouv/components/ts'
 import { toRef } from 'vue'
 
 import IndicatorDatasetCard from '@/custom/ecospheres/components/indicators/IndicatorDatasetCard.vue'
