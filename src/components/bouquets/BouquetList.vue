@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import type { ComputedRef, PropType } from 'vue'
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useLoading } from 'vue-loading-overlay'
 import { useRoute, useRouter, type LocationQueryRaw } from 'vue-router'
 
-import { NoOptionSelected } from '@/model/theme'
-import type { Topic } from '@/model/topic'
 import { useTopicStore } from '@/store/TopicStore'
 import { useUserStore } from '@/store/UserStore'
 import { useTopicsConf } from '@/utils/config'
@@ -15,19 +13,20 @@ const router = useRouter()
 const route = useRoute()
 const topicStore = useTopicStore()
 
-const { topicsName, topicsSlug, topicsExtrasKey } = useTopicsConf()
+const { topicsName, topicsSlug } = useTopicsConf()
 
 const userStore = useUserStore()
 const { canAddBouquet } = storeToRefs(userStore)
 
+// TODO: use BouquetQueryArgs here for typing (migrate include_drafts)
 const props = defineProps({
-  themeName: {
+  theme: {
     type: String,
-    default: NoOptionSelected
+    default: null
   },
-  subthemeName: {
+  subtheme: {
     type: String,
-    default: NoOptionSelected
+    default: null
   },
   showDrafts: {
     type: Boolean
@@ -39,43 +38,30 @@ const props = defineProps({
   query: {
     type: String,
     default: ''
+  },
+  page: {
+    type: String,
+    default: '1'
+  },
+  sort: {
+    type: String,
+    required: true
   }
 })
 
 const emits = defineEmits(['clearFilters'])
 
-const bouquets: ComputedRef<Topic[]> = computed(() => {
-  return topicStore.sorted
-    .filter((bouquet) => {
-      return !props.showDrafts ? !bouquet.private : true
-    })
-    .filter((bouquet) => {
-      if (props.geozone === null) return true
-      return (
-        bouquet.spatial?.zones &&
-        bouquet.spatial.zones.length > 0 &&
-        bouquet.spatial.zones.includes(props.geozone)
-      )
-    })
-    .filter((bouquet) => {
-      if (props.themeName === NoOptionSelected) return true
-      return bouquet.extras[topicsExtrasKey].theme === props.themeName
-    })
-    .filter((bouquet) => {
-      if (props.subthemeName === NoOptionSelected) return true
-      return bouquet.extras[topicsExtrasKey].subtheme === props.subthemeName
-    })
-    .filter((bouquet) => {
-      if (props.query === '') return true
-      return bouquet.name.toLowerCase().includes(props.query.toLowerCase())
-    })
-})
+const {
+  topics: bouquets,
+  pagination,
+  total: nbBouquets
+} = storeToRefs(topicStore)
 
 const numberOfResultMsg: ComputedRef<string> = computed(() => {
-  if (bouquets.value.length === 1) {
+  if (nbBouquets.value === 1) {
     return `1 ${topicsName} disponible`
-  } else if (bouquets.value.length > 1) {
-    return bouquets.value.length + ` ${topicsName}s disponibles`
+  } else if (nbBouquets.value > 1) {
+    return nbBouquets.value + ` ${topicsName}s disponibles`
   } else {
     return 'Aucun résultat ne correspond à votre recherche'
   }
@@ -88,15 +74,40 @@ const createUrl = computed(() => {
 const clearFilters = () => {
   const query: LocationQueryRaw = {}
   if (route.query.drafts) query.drafts = route.query.drafts
-  router.push({ name: topicsSlug, query }).then(() => {
+  router.push({ name: topicsSlug, query, hash: '#bouquets-list' }).then(() => {
     emits('clearFilters')
   })
 }
 
-onMounted(() => {
+const executeQuery = async (args: typeof props) => {
   const loader = useLoading().show({ enforceFocus: false })
-  topicStore.loadTopicsForUniverse().then(() => loader.hide())
-})
+  const { showDrafts, ...cleanArgs } = args
+  const queryArgs = {
+    ...cleanArgs,
+    // TODO: maybe handle this through a prop of the same name
+    ...(showDrafts && { include_private: 'yes' })
+  }
+  return topicStore.query(queryArgs).finally(() => loader.hide())
+}
+
+const goToPage = (page: number) => {
+  router.push({
+    name: topicsSlug,
+    query: { ...route.query, page: page + 1 },
+    hash: '#bouquets-list'
+  })
+}
+
+const doSort = (value: string | null) => {
+  router.push({
+    name: topicsSlug,
+    query: { ...route.query, sort: value },
+    hash: '#bouquets-list'
+  })
+}
+
+// launch search on props (~route.query) changes
+watch(props, () => executeQuery(props), { immediate: true, deep: true })
 
 defineExpose({
   numberOfResultMsg
@@ -105,29 +116,26 @@ defineExpose({
 
 <template>
   <div
-    v-if="bouquets.length > 0"
+    v-if="nbBouquets > 0"
     class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle justify-between fr-pb-2w"
   >
     <h2 class="fr-col-auto fr-my-0 h4">{{ numberOfResultMsg }}</h2>
     <div class="fr-col-auto fr-grid-row fr-grid-row--middle">
-      <label for="sort-search" class="fr-col-auto fr-text--sm fr-m-0 fr-mr-1w"
-        >Trier par :</label
-      >
-      <div class="fr-col">
-        <DsfrSelect
-          v-model="topicStore.sort"
-          select-id="sort-search"
-          :options="[
-            { value: '-created_at', text: 'Les plus récemment créés' },
-            { value: '-last_modified', text: 'Les plus récemment modifiés' },
-            { value: 'name', text: 'Titre' }
-          ]"
-        ></DsfrSelect>
-      </div>
+      <SelectComponent
+        :model-value="sort"
+        label="Trier par :"
+        :label-class="['fr-col-auto', 'fr-text--sm', 'fr-m-0', 'fr-mr-1w']"
+        :options="[
+          { id: '-last_modified', name: 'Les plus récemment modifiés' },
+          { id: '-created', name: 'Les plus récemment créés' },
+          { id: 'name', name: 'Titre' }
+        ]"
+        @update:model-value="doSort"
+      />
     </div>
   </div>
   <div
-    v-if="bouquets.length === 0"
+    v-if="nbBouquets === 0"
     class="fr-mt-2w rounded-xxs fr-p-3w fr-grid-row flex-direction-column bg-contrast-blue-cumulus"
   >
     <div class="fr-col fr-grid-row fr-grid-row--gutters text-blue-400">
@@ -177,6 +185,13 @@ defineExpose({
       </li>
     </ul>
   </div>
+  <DsfrPagination
+    v-if="pagination.length"
+    class="fr-container"
+    :current-page="parseInt(page) - 1"
+    :pages="pagination"
+    @update:current-page="goToPage"
+  />
 </template>
 
 <style scoped>

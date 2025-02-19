@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { DatasetCard } from '@datagouv/components'
 import { useDebounceFn } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import {
   capitalize,
   computed,
@@ -52,10 +53,9 @@ const store = useSearchStore()
 const currentPage = ref(1)
 const localQuery = ref()
 const loader = useLoading()
+const topicStore = useTopicStore()
 
 const queryResults = ref<HTMLParagraphElement | null>(null)
-
-const topicStore = useTopicStore()
 
 const selectedTopicId: Ref<string | null> = ref(null)
 const selectedOrganizationId: Ref<string | null> = ref(null)
@@ -63,6 +63,7 @@ const selectedOrganizationId: Ref<string | null> = ref(null)
 const datasets = computed(() => store.datasets)
 const total = computed(() => store.total)
 const pages = computed(() => store.pagination)
+const { topics } = storeToRefs(topicStore)
 
 const title = config.website.title as string
 const banner = config.website.datasets.banner
@@ -89,14 +90,14 @@ const metaTitle = computed(() => {
 
 const topicOptions = computed(() => {
   if (!topicItems?.length) return
-  const topics = topicStore.$state.data
+  const _topics = topics.value
     .filter((t) => {
       return topicItems.map((st) => st.id).includes(t.id)
     })
     .map((t) => {
       return { value: t.id, text: t.name }
     })
-  return [{ value: '', text: 'Toutes les données' }, ...topics]
+  return [{ value: '', text: 'Toutes les données' }, ..._topics]
 })
 
 const organizationOptions = computed(() => [
@@ -122,7 +123,7 @@ const computeUrlQuery = (
   }
 }
 
-const onSelectTopic = (topicId: string) => {
+const onSelectTopic = (topicId: string | number) => {
   router.push({
     path: '/datasets',
     query: computeUrlQuery({
@@ -132,7 +133,7 @@ const onSelectTopic = (topicId: string) => {
   })
 }
 
-const onSelectOrganization = (orgId: string) => {
+const onSelectOrganization = (orgId: string | number) => {
   router.push({
     path: '/datasets',
     query: computeUrlQuery({

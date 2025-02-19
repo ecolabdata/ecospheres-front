@@ -30,8 +30,6 @@ export interface DatasetProperties {
 export type DatasetsGroups = Map<string, DatasetProperties[]>
 
 export interface SiteTopicExtras {
-  theme: string
-  subtheme: string
   datasets_properties: DatasetProperties[]
   cloned_from?: string
 }

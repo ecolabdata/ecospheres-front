@@ -6,7 +6,7 @@ import { useRoute, useRouter, type LocationQueryRaw } from 'vue-router'
 import type { IndicatorFilters } from '../../model/indicator'
 import { useIndicatorStore } from '../../store/IndicatorStore'
 
-import SelectComponent from '../SelectComponent.vue'
+import SelectComponent from '@/components/SelectComponent.vue'
 import IndicatorCard from './IndicatorCard.vue'
 
 const route = useRoute()

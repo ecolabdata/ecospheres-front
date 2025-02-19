@@ -8,6 +8,7 @@ import {
 } from 'vue'
 
 import type { BreadcrumbItem } from '@/model/breadcrumb'
+import type { ResolvedTag } from '@/model/tag'
 import {
   Availability,
   type DatasetProperties,
@@ -20,8 +21,7 @@ import { useTopicStore } from '@/store/TopicStore'
 import { useUserStore } from '@/store/UserStore'
 import { useTopicsConf } from '@/utils/config'
 
-const { topicsSlug, topicsName, topicsExtrasKey, topicsUseThemes } =
-  useTopicsConf()
+const { topicsSlug, topicsName, topicsExtrasKey } = useTopicsConf()
 
 export const isAvailable = (availability: Availability): boolean => {
   return [Availability.LOCAL_AVAILABLE, Availability.URL_AVAILABLE].includes(
@@ -71,8 +71,8 @@ export const cloneTopic = (topic: Topic): TopicPostData => {
 }
 
 export function useBreadcrumbLinksForTopic(
-  theme: Ref<string | undefined>,
-  subtheme: Ref<string | undefined>,
+  theme: Ref<ResolvedTag | undefined>,
+  subtheme: Ref<ResolvedTag | undefined>,
   topic: Ref<Topic | null>,
   topicsListAll: boolean | null
 ): ComputedRef<BreadcrumbItem[]> {
@@ -86,11 +86,16 @@ export function useBreadcrumbLinksForTopic(
     }
 
     if (theme.value !== undefined && subtheme.value !== undefined) {
+      const themeName = theme.value.name
+      const subthemeName = subtheme.value.name
       breadcrumbs.push(
-        { text: theme.value, to: `/${topicsSlug}/?theme=${theme.value}` },
         {
-          text: subtheme.value,
-          to: `/${topicsSlug}/?theme=${theme.value}&subtheme=${subtheme.value}`
+          text: themeName,
+          to: `/${topicsSlug}/?theme=${themeName}`
+        },
+        {
+          text: subthemeName,
+          to: `/${topicsSlug}/?theme=${themeName}&subtheme=${subthemeName}`
         }
       )
     }
@@ -104,13 +109,9 @@ export function useBreadcrumbLinksForTopic(
 }
 
 export function useExtras(topic: Ref<Topic | null | undefined>): {
-  theme: Ref<string | undefined>
-  subtheme: Ref<string | undefined>
   datasetsProperties: Ref<DatasetProperties[]>
   clonedFrom: Ref<Topic | null>
 } {
-  const theme: Ref<string | undefined> = ref()
-  const subtheme: Ref<string | undefined> = ref()
   const datasetsProperties: Ref<DatasetProperties[]> = ref([])
   const clonedFrom = ref<Topic | null>(null)
 
@@ -119,8 +120,6 @@ export function useExtras(topic: Ref<Topic | null | undefined>): {
     () => {
       const extras = topic.value?.extras[topicsExtrasKey]
       if (extras != null) {
-        theme.value = topicsUseThemes ? extras.theme : undefined
-        subtheme.value = topicsUseThemes ? extras.subtheme : undefined
         datasetsProperties.value = extras.datasets_properties ?? []
 
         if (extras.cloned_from != null) {
@@ -137,8 +136,6 @@ export function useExtras(topic: Ref<Topic | null | undefined>): {
           clonedFrom.value = null
         }
       } else {
-        theme.value = undefined
-        subtheme.value = undefined
         datasetsProperties.value = []
         clonedFrom.value = null
       }
@@ -146,5 +143,5 @@ export function useExtras(topic: Ref<Topic | null | undefined>): {
     { immediate: true }
   )
 
-  return { theme, subtheme, datasetsProperties, clonedFrom }
+  return { datasetsProperties, clonedFrom }
 }

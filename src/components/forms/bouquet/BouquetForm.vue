@@ -5,14 +5,14 @@ import { capitalize, onMounted, ref, type Ref } from 'vue'
 
 import SelectSpatialCoverage from '@/components/forms/SelectSpatialCoverage.vue'
 import type { SpatialCoverage } from '@/model/spatial'
-import { NoOptionSelected } from '@/model/theme'
 import type { TopicPostData } from '@/model/topic'
 import { useTopicsConf } from '@/utils/config'
 import { useSpatialCoverage } from '@/utils/spatial'
-import { useThemeOptions } from '@/utils/theme'
+import { useTag, useTagOptions, useTagSlug } from '@/utils/tags'
 
 const topic = defineModel({
-  type: Object as () => Partial<TopicPostData> & Pick<TopicPostData, 'extras'>,
+  type: Object as () => Partial<TopicPostData> &
+    Pick<TopicPostData, 'extras' | 'tags'>,
   required: true
 })
 const formErrors = defineModel('formErrors', {
@@ -30,27 +30,19 @@ type FormErrors = {
 const emits = defineEmits(['updateValidation'])
 
 const spatialCoverage = useSpatialCoverage(topic)
-const {
-  topicsUseThemes,
-  topicsExtrasKey,
-  topicsMainTheme,
-  topicsSecondaryTheme,
-  topicsName
-} = useTopicsConf()
+const { topicsUseThemes, topicsMainTheme, topicsSecondaryTheme, topicsName } =
+  useTopicsConf()
+
+const initialTheme = useTag('bouquets', topic, 'theme')
+const initialSubtheme = useTag('bouquets', topic, 'subtheme')
 
 // Define values and validation rules for each field
 const { values, errors, defineField, handleSubmit } = useForm({
   initialValues: {
     name: topic.value.name ?? '',
     description: topic.value.description ?? '',
-    theme:
-      topic.value.extras[topicsExtrasKey].theme === NoOptionSelected
-        ? ''
-        : topic.value.extras[topicsExtrasKey].theme,
-    subtheme:
-      topic.value.extras[topicsExtrasKey].subtheme === NoOptionSelected
-        ? ''
-        : topic.value.extras[topicsExtrasKey].subtheme
+    theme: initialTheme.value?.id || '',
+    subtheme: initialSubtheme.value?.id || ''
   },
   validationSchema: {
     name: required,
@@ -79,8 +71,15 @@ const onValidSubmit = async (validatedValues: {
   // set topic values from validated fields
   topic.value.name = validatedValues.name
   topic.value.description = validatedValues.description
-  topic.value.extras[topicsExtrasKey].theme = validatedValues.theme
-  topic.value.extras[topicsExtrasKey].subtheme = validatedValues.subtheme
+  topic.value.tags = [
+    ...topic.value.tags.filter(
+      (tag) =>
+        !tag.startsWith(useTagSlug('bouquets', 'theme')) &&
+        !tag.startsWith(useTagSlug('bouquets', 'subtheme'))
+    ),
+    useTagSlug('bouquets', 'theme', validatedValues.theme),
+    useTagSlug('bouquets', 'subtheme', validatedValues.subtheme)
+  ]
   // sync valid status with parent
   emits('updateValidation', true)
 }
@@ -97,7 +96,8 @@ defineExpose({
   onSubmit
 })
 
-const { themeOptions, subthemeOptions } = useThemeOptions(theme)
+const { tagOptions: themeOptions, subTagOptions: subthemeOptions } =
+  useTagOptions('bouquets', theme, 'theme')
 
 const onUpdateSpatialCoverage = (value: SpatialCoverage | undefined) => {
   const zones = value === undefined ? null : [value.id]
@@ -106,11 +106,11 @@ const onUpdateSpatialCoverage = (value: SpatialCoverage | undefined) => {
 
 // initialize theme and subtheme from topic values, if any
 onMounted(() => {
-  if (topic.value.extras[topicsExtrasKey].theme !== NoOptionSelected) {
-    theme.value = topic.value.extras[topicsExtrasKey].theme
+  if (initialTheme.value) {
+    theme.value = initialTheme.value.id
   }
-  if (topic.value.extras[topicsExtrasKey].subtheme !== NoOptionSelected) {
-    subtheme.value = topic.value.extras[topicsExtrasKey].subtheme
+  if (initialSubtheme.value) {
+    subtheme.value = initialSubtheme.value.id
   }
 })
 </script>
@@ -187,11 +187,11 @@ onMounted(() => {
       </option>
       <option
         v-for="option in themeOptions"
-        :key="option.value"
-        :value="option.value"
-        :selected="option.value === theme"
+        :key="option.id"
+        :value="option.id"
+        :selected="option.id === theme"
       >
-        {{ option.text }}
+        {{ option.name }}
       </option>
     </select>
     <p v-if="errors.theme && isSubmitted" id="errors-theme" class="error">
@@ -223,16 +223,16 @@ onMounted(() => {
       </option>
       <option
         v-for="option in subthemeOptions"
-        :key="option.value"
-        :value="option.value"
-        :selected="option.value === subtheme"
+        :key="option.id"
+        :value="option.id"
+        :selected="option.id === subtheme"
       >
-        {{ option.text }}
+        {{ option.name }}
       </option>
     </select>
     <p v-if="errors.subtheme && isSubmitted" id="errors-subtheme" class="error">
       <VIconCustom name="error-fill" />
-      Veuillez sélectionner un chantier.
+      Veuillez sélectionner un {{ topicsSecondaryTheme }}.
     </p>
     <p v-if="theme === ''" id="subtheme-instructions" class="fr-text--sm">
       Choisissez d'abord une {{ topicsMainTheme }}

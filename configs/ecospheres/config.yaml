@@ -11,6 +11,8 @@ universe:
   topic_id: 65141cd780d73f98142e9265
   # universe name, used as bouquets tag
   name: ecospheres
+  indicators:
+    organization_id: 672b5425a62a44ddee8815bd
 
 robots:
   disallow:
@@ -133,7 +135,7 @@ website:
   default_debounce_wait: 600
   pagination_sizes:
     organizations_list: 9
-    topics_list: 100
+    topics_list: 20
     files_list: 6
   contact_email: ecospheres@developpement-durable.gouv.fr
   home_banner_colors:
@@ -200,369 +202,424 @@ website:
     - name: Accessibilité
       path: /accessibility
 
-themes:
-  - name: Se loger
-    color: 'var(--blue-ecume-sun-247-moon-675)'
-    textColor: 'var(--blue-ecume-975-75)'
-    subthemes:
-      - name: Construction et rénovation des logements
-      - name: Aménagements des villes
-  - name: Produire
-    color: 'var(--green-archipel-sun-391-moon-716)'
-    textColor: 'var(--green-archipel-975-75)'
-    subthemes:
-      - name: Nucléaire
-      - name: Tertiaire (incluant les bâtiments publics de l'État et des collectivités, hors logement)
-      - name: Production d'électricité décarbonée (hors nucléaire)
-  - name: Se nourrir
-    color: 'var(--green-menthe-975-75)'
-    textColor: 'var(--green-menthe-sun-373-moon-652)'
-    subthemes:
-      - name: Alimentation
-      - name: Agriculture et pêche
-  - name: Consommer
-    color: 'var(--green-emeraude-975-75)'
-    textColor: 'var(--green-emeraude-sun-425-moon-753)'
-    subthemes:
-      - name: Consommation plus durable (ménages)
-      - name: Numérique responsable
-      - name: Achats durables (de l'État, des collectivités et des entreprises)
-  - name: Préserver
-    color: 'var(--green-bourgeon-975-75)'
-    textColor: 'var(--green-bourgeon-sun-425-moon-759)'
-    subthemes:
-      - name: Eau
-      - name: Sols
-      - name: Océans et mers
-      - name: Forêt
-  - name: Se déplacer
-    color: 'var(--green-tilleul-verveine-975-75)'
-    textColor: 'var(--green-tilleul-verveine-sun-418-moon-817)'
-    subthemes:
-      - name: Voitures et infrastructures routières
-      - name: Mobilité courte distance (hors voiture)
-      - name: Mobilité longue distance (avion, train)
-  - name: Chantiers transverses
-    color: 'var(--blue-ecume-975-75)'
-    textColor: 'var(--blue-ecume-sun-247-moon-675)'
-    subthemes:
-      - name: Le financement qui permet de définir des trajectoires d'investissement crédibles et cohérentes
-      - name: La planification et la différenciation territoriale selon les caractéristiques et les spécificités de chaque territoire, incluant les territoires ultra-marins
-      - name: La transition des filières avec la gestion des emplois, des formations et des compétences
-      - name: Les données environnementales
-      - name: Les services publics exemplaires
-      - name: La transition juste et les mesures d’accompagnement, pour ne laisser personne au bord du chemin
-      - name: La sobriété des usages et des ressources
-
 organizations: https://raw.githubusercontent.com/ecolabdata/ecospheres-universe/refs/heads/main/dist/organizations-demo.json
 
-indicators:
-  organization_id: 672b5425a62a44ddee8815bd
-  global_tag_prefix: ecospheres-indicateurs
-  filters:
-    - name: Thématique
-      id: theme
-      color: green-menthe
-      values:
-        - id: mieux-produire
-          name: Mieux produire
-        - id: mieux-se-nourrir
-          name: Mieux se nourrir
-        - id: mieux-se-deplacer
-          name: Mieux se déplacer
-        - id: mieux-preserver-valoriser-ecosystemes
-          name: Mieux préserver et valoriser nos ecosystèmes
-        - id: mieux-se-loger
-          name: Mieux se loger
-        - id: mieux-consommer
-          name: Mieux consommer
-        - id: autre
-          name: Autre
-    - name: Enjeu
-      id: enjeu
-      color: blue-ecume
-      values:
-        - id: climat
-          name: Climat
-        - id: biodiversite
-          name: Biodiversité
-        - id: adaptation
-          name: Adaptation
-        - id: ressources
-          name: Ressources
-        - id: sante
-          name: Santé
-    - name: Secteur
-      id: secteur
-      color: purple-glycine
-      values:
-        - id: agriculture-forets-sols
-          name: Agriculture, Forêts et Sols
-        - id: alimentation
-          name: Alimentation
-        - id: batiment
-          name: Bâtiment
-        - id: dechets
-          name: Déchets
-        - id: eau
-          name: Eau
-        - id: energie
-          name: Energie
-        - id: industrie
-          name: Industrie
-        - id: transport-marchandises
-          name: Transport de marchandises
-        - id: transport-voyageurs
-          name: Transport de voyageurs
-    - name: Levier
-      id: levier
-      color: green-archipel
-      values:
-        - id: gestion-des-forets-et-produits-bois
-          name: Gestion des forêts et produits bois
-        - id: changements-de-pratiques-de-fertilisation-azotee
-          name: Changements de pratiques de fertilisation azotée
-        - id: elevage-durable
-          name: Elevage durable
-        - id: gestion-des-haies
-          name: Gestion des haies
-        - id: batiments-machines-agricoles
-          name: Bâtiments & Machines agricoles
-        - id: gestion-des-prairies
-          name: Gestion des prairies
-        - id: pratiques-stockantes
-          name: Pratiques stockantes
-        - id: sobriete-fonciere
-          name: Sobriété foncière
-        - id: surface-en-aire-protegee
-          name: Surface en aire protégée
-        - id: resorption-des-points-noirs-prioritaires-de-continuite-ecologique
-          name: Résorption des points noirs prioritaires de continuité écologique
-        - id: restauration-des-habitats-naturels
-          name: Restauration des habitats naturels
-        - id: reduction-de-lusage-des-produits-phytosanitaires
-          name: Réduction de l'usage des produits phytosanitaires
-        - id: developpement-de-lagriculture-biologique-et-de-hve
-          name: Développement de l'agriculture biologique et de HVE
-        - id: respect-degalim-pour-la-restauration-collective
-          name: Respect d'Egalim pour la restauration collective
-        - id: sobriete-des-batiments-residentiel
-          name: Sobriété des bâtiments (résidentiel)
-        - id: changement-chaudieres-fioul-renovation-residentiel
-          name: Changement chaudières fioul + rénovation (résidentiel)
-        - id: changement-chaudieres-gaz-renovation-residentiel
-          name: Changement chaudières gaz + rénovation (résidentiel)
-        - id: renovation-hors-changement-chaudieres
-          name: Rénovation (hors changement chaudières)
-        - id: sobriete-des-batiments-tertiaire
-          name: Sobriété des bâtiments (tertiaire)
-        - id: changement-chaudieres-fioul-renovation-tertiaire
-          name: Changement chaudières fioul + rénovation (tertiaire)
-        - id: changement-chaudieres-gaz-renovation-tertiaire
-          name: Changement chaudières gaz + rénovation (tertiaire)
-        - id: gaz-fluores-residentiel
-          name: Gaz fluorés résidentiel
-        - id: gaz-fluores-tertiaire
-          name: Gaz fluorés tertiaire
-        - id: captage-de-methane-dans-les-isdnd
-          name: Captage de méthane dans les ISDND
-        - id: sobriete-dechets
-          name: Sobriété déchets
-        - id: valorisation-matiere-des-dechets
-          name: Valorisation matière des déchets
-        - id: collecte-et-tri-des-dechets
-          name: Collecte et tri des déchets
-        - id: sobriete-dans-lutilisation-de-la-ressource-en-eau
-          name: Sobriété dans l'utilisation de la ressource en eau
-        - id: protection-des-zones-de-captage-deau
-          name: Protection des zones de captage d'eau
-        - id: desimpermeabilisation-des-sols
-          name: Désimperméabilisation des sols
-        - id: electricite-renouvelable
-          name: Electricité renouvelable
-        - id: biogaz
-          name: Biogaz
-        - id: top-50-sites-industriels
-          name: Top 50 sites industriels
-        - id: industrie-diffuse
-          name: Industrie diffuse
-        - id: fret-decarbone-et-multimodalite
-          name: Fret décarboné et multimodalité
-        - id: reseaux-de-chaleur-decarbones
-          name: Réseaux de chaleur décarbonés
-        - id: efficacite-et-sobriete-logistique
-          name: Efficacité et sobriété logistique
-        - id: reduction-des-deplacements
-          name: Réduction des déplacements
-        - id: covoiturage
-          name: Covoiturage
-        - id: velo
-          name: Vélo
-        - id: transports-en-commun
-          name: Transports en commun
-        - id: vehicules-electriques
-          name: Véhicules électriques
-        - id: efficacite-energetique-des-vehicules-prives
-          name: Efficacité énergétique des véhicules privés
-        - id: bus-et-cars-decarbones
-          name: Bus et cars décarbonés
-        - id: 2-roues-elec-efficacite
-          name: 2 roues (élec&efficacité)
-        - id: nucleaire
-          name: Nucléaire
-        - id: bio-carburants
-          name: Bio-carburants
-        - id: efficacite-des-aeronefs
-          name: Efficacité des aéronefs
-        - id: saf
-          name: SAF
-    - name: Producteur source
-      id: producteur
-      color: orange-terre-battue
-      values:
-        - id: odre
-          name: ODRE
-        - id: agence-ore-odre
-          name: Agence ORE / ODRE
-        - id: ademe
-          name: ADEME
-        - id: insee
-          name: INSEE
-        - id: openstreetmap
-          name: OpenStreetMap
-        - id: georisque
-          name: Georisque
-        - id: eaufrance
-          name: Eaufrance
-        - id: citepa
-          name: CITEPA
-        - id: cemagref-dapres-ue-soes-2006
-          name: Cemagref d'apres UE - SOeS, 2006
-        - id: cerema
-          name: CEREMA
-        - id: collectivite
-          name: Collectivite
-        - id: aidesterritoires
-          name: AidesTerritoires
-        - id: dreal-pdl
-          name: DREAL PDL
-        - id: dgitm-registre-de-preuve-de-covoiturage
-          name: DGITM ( Registre de Preuve de Covoiturage)
-        - id: blablacar
-          name: Blablacar
-        - id: ''
-          name: '***********'
-        - id: francemarches
-          name: FranceMarches
-        - id: mtc
-          name: MTC
-        - id: sncf
-          name: SNCF
-        - id: mtes-dgpr-registre-francais-des-emissions-polluantes
-          name: MTES - DGPR - Registre francais des emissions polluantes
-        - id: sdes
-          name: SDES
-        - id: insee-recensement-de-la-population-exploitation-principale
-          name: Insee, Recensement de la population (exploitation principale)
-        - id: mtes-dgpr-gaspar-gestion-assistee-des-procedures-administratives-relatives-aux-risques-naturels
-          name:
-            MTES - DGPR - GASPAR (Gestion Assistée des Procédures Administratives
-            relatives aux Risques naturels)
-        - id: mtes-direction-generale-de-la-prevention-des-risques-registre-francais-des-emissions-polluantes
-          name:
-            MTES Direction generale de la prevention des risques, Registre francais
-            des emissions polluantes
-        - id: agence-de-leau
-          name: Agence de l'Eau
-        - id: direction-generale-de-la-sante-dgs
-          name: Direction generale de la Sante (DGS)
-        - id: ue-sdes-corine-land-cover-2012-et-2018
-          name: UE ; SDES, CORINE Land Cover 2012 et 2018
-        - id: ademe-sinoe-itom
-          name: ADEME/ Sinoe, ITOM
-        - id: mtes-dgpr-traitement-sdes
-          name: MTES - DGPR - traitement SDES
-        - id: bases-de-donnees-corine-land-cover
-          name: Bases de donnees CORINE Land Cover
-        - id: museum-national-dhistoire-naturelle-sig-dapres-donnees-reglementaires-du-mtes-dgaln
-          name:
-            Museum national d’histoire naturelle (SIG), d’apres donnees reglementaires
-            du MTES/DGALN
-        - id: insee-recensement-de-la-population-exploitation-complementaire-au-lieu-de-travail
-          name:
-            Insee, Recensement de la population (exploitation complementaire au lieu
-            de travail)
-        - id: mtes-dgpr-gaspar-gestion-assistee-des-procedures-administratives-relatives-aux-risques-naturels
-          name:
-            MTES - DGPR - GASPAR (Gestion Assistee des Procedures Administratives
-            relatives aux Risques naturels)
-        - id: onema-banque-nationale-des-prelevements-quantitatifs-en-eau-bnpe-traitements-sdes
-          name:
-            'Onema, Banque nationale des prelevements quantitatifs en eau. (BNPE).
-            Traitements : SDES'
-        - id: mte-dgaln-deb-traitements-sdes
-          name: MTE, DGALN, DEB, traitements SDES
-        - id: fichier-central-des-automobiles
-          name: fichier central des automobiles
-        - id: agence-bioagreste
-          name: Agence Bio,AGRESTE
-        - id: agence-bio
-          name: Agence Bio
-        - id: oecp
-          name: OECP
-        - id: agreste
-          name: AGRESTE
-        - id: sgfgas
-          name: SGFGAS
-        - id: ma-cantine
-          name: Ma Cantine
-        - id: transportdatagouv
-          name: TransportDataGouv
-        - id: rare-orec
-          name: RARE - OREC
-        - id: ministere-de-lagriculture-et-de-la-souverainete-alimentaire
-          name: Ministère de l'Agriculture et de la Souveraineté alimentaire
-        - id: geovelo
-          name: GEOVELO
-        - id: ign
-          name: IGN
-        - id: opendatasoft
-          name: OpenDataSoft
-        - id: osm
-          name: OSM
-        - id: ceremaosm
-          name: CEREMA,OSM
-        - id: sitadel
-          name: SITADEL
-        - id: eld
-          name: ELD
-        - id: mte-ministere-de-la-transition-ecologique
-          name: MTE - Ministere de la Transition Ecologique
-        - id: cstb
-          name: CSTB
-        - id: bnpe
-          name: BNPE
-        - id: rte
-          name: RTE
-        - id: enedis
-          name: Enedis
-        - id: edf-sei
-          name: EDF SEI
-        - id: ofb
-          name: OFB
-        - id: atmo
-          name: Atmo
-        - id: anct
-          name: ANCT
-    - name: Cas d'usage
-      id: usage
-      color: yellow-tournesol-main-731
-      values:
-        - id: tdb-mobilite-durable
-          name: Indicateurs Tableau de bord de mobilité Durable
-        - id: territoires-en-transitions
-          name:
-            Indicateurs du programme Territoire Engagé de l'ADEME (Territoires en
-            Transitions)
-        - id: cop-region
-          name: Indicateurs de planification écologique régionale (COPs)
+filters:
+  bouquets:
+    tag_prefix: ecospheres
+    items:
+      - name: Thématique
+        id: theme
+        child: subtheme
+        color: noop
+        values:
+          - id: se-loger
+            name: Se loger
+          - id: produire
+            name: Produire
+          - id: se-nourrir
+            name: Se nourrir
+          - id: consommer
+            name: Consommer
+          - id: preserver
+            name: Préserver
+          - id: se-deplacer
+            name: Se déplacer
+          - id: chantiers-transverses
+            name: Chantiers transverses
+      - name: Chantier
+        id: subtheme
+        color: green-archipel
+        values:
+          - id: construction-et-renovation-des-logements
+            name: Construction et rénovation des logements
+            parent: se-loger
+          - id: amenagements-des-villes
+            name: Aménagements des villes
+            parent: se-loger
+          - id: nucleaire
+            name: Nucléaire
+            parent: produire
+          - id: tertiaire
+            name:
+              Tertiaire (incluant les bâtiments publics de l'État et des collectivités,
+              hors logement)
+            parent: produire
+          - id: electricite-decarbonee
+            name: Production d'électricité décarbonée (hors nucléaire)
+            parent: produire
+          - id: alimentation
+            name: Alimentation
+            parent: se-nourrir
+          - id: agriculture-et-peche
+            name: Agriculture et pêche
+            parent: se-nourrir
+          - id: consommation-plus-durable-menages
+            name: Consommation plus durable (ménages)
+            parent: consommer
+          - id: numerique-responsable
+            name: Numérique responsable
+            parent: consommer
+          - id: achats-durables
+            name: Achats durables (de l'État, des collectivités et des entreprises)
+            parent: consommer
+          - id: eau
+            name: Eau
+            parent: preserver
+          - id: sols
+            name: Sols
+            parent: preserver
+          - id: oceans-et-mers
+            name: Océans et mers
+            parent: preserver
+          - id: foret
+            name: Forêt
+            parent: preserver
+          - id: voitures-et-infrastructures-routieres
+            name: Voitures et infrastructures routières
+            parent: se-deplacer
+          - id: mobilite-courte-distance-hors-voiture
+            name: Mobilité courte distance (hors voiture)
+            parent: se-deplacer
+          - id: mobilite-longue-distance-avion-train
+            name: Mobilité longue distance (avion, train)
+            parent: se-deplacer
+          - id: financement-investissement
+            name:
+              Le financement qui permet de définir des trajectoires d'investissement
+              crédibles et cohérentes
+            parent: chantiers-transverses
+          - id: planification-differenciation-territoriale
+            name:
+              La planification et la différenciation territoriale selon les caractéristiques
+              et les spécificités de chaque territoire, incluant les territoires ultra-marins
+            parent: chantiers-transverses
+          - id: transition-filieres-emplois-formations-competences
+            name:
+              La transition des filières avec la gestion des emplois, des formations
+              et des compétences
+            parent: chantiers-transverses
+          - id: donnees-environnementales
+            name: Les données environnementales
+            parent: chantiers-transverses
+          - id: services-publics-exemplaires
+            name: Les services publics exemplaires
+            parent: chantiers-transverses
+          - id: transition-juste
+            name:
+              La transition juste et les mesures d’accompagnement, pour ne laisser personne
+              au bord du chemin
+            parent: chantiers-transverses
+          - id: sobriete-usages-ressources
+            name: La sobriété des usages et des ressources
+            parent: chantiers-transverses
+  # INDICATORS
+  indicators:
+    tag_prefix: ecospheres-indicateurs
+    items:
+      - name: Thématique
+        id: theme
+        color: green-menthe
+        values:
+          - id: mieux-produire
+            name: Mieux produire
+          - id: mieux-se-nourrir
+            name: Mieux se nourrir
+          - id: mieux-se-deplacer
+            name: Mieux se déplacer
+          - id: mieux-preserver-valoriser-ecosystemes
+            name: Mieux préserver et valoriser nos ecosystèmes
+          - id: mieux-se-loger
+            name: Mieux se loger
+          - id: mieux-consommer
+            name: Mieux consommer
+          - id: autre
+            name: Autre
+      - name: Enjeu
+        id: enjeu
+        color: blue-ecume
+        values:
+          - id: climat
+            name: Climat
+          - id: biodiversite
+            name: Biodiversité
+          - id: adaptation
+            name: Adaptation
+          - id: ressources
+            name: Ressources
+          - id: sante
+            name: Santé
+      - name: Secteur
+        id: secteur
+        color: purple-glycine
+        values:
+          - id: agriculture-forets-sols
+            name: Agriculture, Forêts et Sols
+          - id: alimentation
+            name: Alimentation
+          - id: batiment
+            name: Bâtiment
+          - id: dechets
+            name: Déchets
+          - id: eau
+            name: Eau
+          - id: energie
+            name: Energie
+          - id: industrie
+            name: Industrie
+          - id: transport-marchandises
+            name: Transport de marchandises
+          - id: transport-voyageurs
+            name: Transport de voyageurs
+      - name: Levier
+        id: levier
+        color: green-archipel
+        values:
+          - id: gestion-des-forets-et-produits-bois
+            name: Gestion des forêts et produits bois
+          - id: changements-de-pratiques-de-fertilisation-azotee
+            name: Changements de pratiques de fertilisation azotée
+          - id: elevage-durable
+            name: Elevage durable
+          - id: gestion-des-haies
+            name: Gestion des haies
+          - id: batiments-machines-agricoles
+            name: Bâtiments & Machines agricoles
+          - id: gestion-des-prairies
+            name: Gestion des prairies
+          - id: pratiques-stockantes
+            name: Pratiques stockantes
+          - id: sobriete-fonciere
+            name: Sobriété foncière
+          - id: surface-en-aire-protegee
+            name: Surface en aire protégée
+          - id: resorption-des-points-noirs-prioritaires-de-continuite-ecologique
+            name: Résorption des points noirs prioritaires de continuité écologique
+          - id: restauration-des-habitats-naturels
+            name: Restauration des habitats naturels
+          - id: reduction-de-lusage-des-produits-phytosanitaires
+            name: Réduction de l'usage des produits phytosanitaires
+          - id: developpement-de-lagriculture-biologique-et-de-hve
+            name: Développement de l'agriculture biologique et de HVE
+          - id: respect-degalim-pour-la-restauration-collective
+            name: Respect d'Egalim pour la restauration collective
+          - id: sobriete-des-batiments-residentiel
+            name: Sobriété des bâtiments (résidentiel)
+          - id: changement-chaudieres-fioul-renovation-residentiel
+            name: Changement chaudières fioul + rénovation (résidentiel)
+          - id: changement-chaudieres-gaz-renovation-residentiel
+            name: Changement chaudières gaz + rénovation (résidentiel)
+          - id: renovation-hors-changement-chaudieres
+            name: Rénovation (hors changement chaudières)
+          - id: sobriete-des-batiments-tertiaire
+            name: Sobriété des bâtiments (tertiaire)
+          - id: changement-chaudieres-fioul-renovation-tertiaire
+            name: Changement chaudières fioul + rénovation (tertiaire)
+          - id: changement-chaudieres-gaz-renovation-tertiaire
+            name: Changement chaudières gaz + rénovation (tertiaire)
+          - id: gaz-fluores-residentiel
+            name: Gaz fluorés résidentiel
+          - id: gaz-fluores-tertiaire
+            name: Gaz fluorés tertiaire
+          - id: captage-de-methane-dans-les-isdnd
+            name: Captage de méthane dans les ISDND
+          - id: sobriete-dechets
+            name: Sobriété déchets
+          - id: valorisation-matiere-des-dechets
+            name: Valorisation matière des déchets
+          - id: collecte-et-tri-des-dechets
+            name: Collecte et tri des déchets
+          - id: sobriete-dans-lutilisation-de-la-ressource-en-eau
+            name: Sobriété dans l'utilisation de la ressource en eau
+          - id: protection-des-zones-de-captage-deau
+            name: Protection des zones de captage d'eau
+          - id: desimpermeabilisation-des-sols
+            name: Désimperméabilisation des sols
+          - id: electricite-renouvelable
+            name: Electricité renouvelable
+          - id: biogaz
+            name: Biogaz
+          - id: top-50-sites-industriels
+            name: Top 50 sites industriels
+          - id: industrie-diffuse
+            name: Industrie diffuse
+          - id: fret-decarbone-et-multimodalite
+            name: Fret décarboné et multimodalité
+          - id: reseaux-de-chaleur-decarbones
+            name: Réseaux de chaleur décarbonés
+          - id: efficacite-et-sobriete-logistique
+            name: Efficacité et sobriété logistique
+          - id: reduction-des-deplacements
+            name: Réduction des déplacements
+          - id: covoiturage
+            name: Covoiturage
+          - id: velo
+            name: Vélo
+          - id: transports-en-commun
+            name: Transports en commun
+          - id: vehicules-electriques
+            name: Véhicules électriques
+          - id: efficacite-energetique-des-vehicules-prives
+            name: Efficacité énergétique des véhicules privés
+          - id: bus-et-cars-decarbones
+            name: Bus et cars décarbonés
+          - id: 2-roues-elec-efficacite
+            name: 2 roues (élec&efficacité)
+          - id: nucleaire
+            name: Nucléaire
+          - id: bio-carburants
+            name: Bio-carburants
+          - id: efficacite-des-aeronefs
+            name: Efficacité des aéronefs
+          - id: saf
+            name: SAF
+      - name: Producteur source
+        id: producteur
+        color: orange-terre-battue
+        values:
+          - id: odre
+            name: ODRE
+          - id: agence-ore-odre
+            name: Agence ORE / ODRE
+          - id: ademe
+            name: ADEME
+          - id: insee
+            name: INSEE
+          - id: openstreetmap
+            name: OpenStreetMap
+          - id: georisque
+            name: Georisque
+          - id: eaufrance
+            name: Eaufrance
+          - id: citepa
+            name: CITEPA
+          - id: cemagref-dapres-ue-soes-2006
+            name: Cemagref d'apres UE - SOeS, 2006
+          - id: cerema
+            name: CEREMA
+          - id: collectivite
+            name: Collectivite
+          - id: aidesterritoires
+            name: AidesTerritoires
+          - id: dreal-pdl
+            name: DREAL PDL
+          - id: dgitm-registre-de-preuve-de-covoiturage
+            name: DGITM ( Registre de Preuve de Covoiturage)
+          - id: blablacar
+            name: Blablacar
+          - id: ''
+            name: '***********'
+          - id: francemarches
+            name: FranceMarches
+          - id: mtc
+            name: MTC
+          - id: sncf
+            name: SNCF
+          - id: mtes-dgpr-registre-francais-des-emissions-polluantes
+            name: MTES - DGPR - Registre francais des emissions polluantes
+          - id: sdes
+            name: SDES
+          - id: insee-recensement-de-la-population-exploitation-principale
+            name: Insee, Recensement de la population (exploitation principale)
+          - id: mtes-dgpr-gaspar-gestion-assistee-des-procedures-administratives-relatives-aux-risques-naturels
+            name:
+              MTES - DGPR - GASPAR (Gestion Assistée des Procédures Administratives
+              relatives aux Risques naturels)
+          - id: mtes-direction-generale-de-la-prevention-des-risques-registre-francais-des-emissions-polluantes
+            name:
+              MTES Direction generale de la prevention des risques, Registre francais
+              des emissions polluantes
+          - id: agence-de-leau
+            name: Agence de l'Eau
+          - id: direction-generale-de-la-sante-dgs
+            name: Direction generale de la Sante (DGS)
+          - id: ue-sdes-corine-land-cover-2012-et-2018
+            name: UE ; SDES, CORINE Land Cover 2012 et 2018
+          - id: ademe-sinoe-itom
+            name: ADEME/ Sinoe, ITOM
+          - id: mtes-dgpr-traitement-sdes
+            name: MTES - DGPR - traitement SDES
+          - id: bases-de-donnees-corine-land-cover
+            name: Bases de donnees CORINE Land Cover
+          - id: museum-national-dhistoire-naturelle-sig-dapres-donnees-reglementaires-du-mtes-dgaln
+            name:
+              Museum national d’histoire naturelle (SIG), d’apres donnees reglementaires
+              du MTES/DGALN
+          - id: insee-recensement-de-la-population-exploitation-complementaire-au-lieu-de-travail
+            name:
+              Insee, Recensement de la population (exploitation complementaire au lieu
+              de travail)
+          - id: mtes-dgpr-gaspar-gestion-assistee-des-procedures-administratives-relatives-aux-risques-naturels
+            name:
+              MTES - DGPR - GASPAR (Gestion Assistee des Procedures Administratives
+              relatives aux Risques naturels)
+          - id: onema-banque-nationale-des-prelevements-quantitatifs-en-eau-bnpe-traitements-sdes
+            name:
+              'Onema, Banque nationale des prelevements quantitatifs en eau. (BNPE).
+              Traitements : SDES'
+          - id: mte-dgaln-deb-traitements-sdes
+            name: MTE, DGALN, DEB, traitements SDES
+          - id: fichier-central-des-automobiles
+            name: fichier central des automobiles
+          - id: agence-bioagreste
+            name: Agence Bio,AGRESTE
+          - id: agence-bio
+            name: Agence Bio
+          - id: oecp
+            name: OECP
+          - id: agreste
+            name: AGRESTE
+          - id: sgfgas
+            name: SGFGAS
+          - id: ma-cantine
+            name: Ma Cantine
+          - id: transportdatagouv
+            name: TransportDataGouv
+          - id: rare-orec
+            name: RARE - OREC
+          - id: ministere-de-lagriculture-et-de-la-souverainete-alimentaire
+            name: Ministère de l'Agriculture et de la Souveraineté alimentaire
+          - id: geovelo
+            name: GEOVELO
+          - id: ign
+            name: IGN
+          - id: opendatasoft
+            name: OpenDataSoft
+          - id: osm
+            name: OSM
+          - id: ceremaosm
+            name: CEREMA,OSM
+          - id: sitadel
+            name: SITADEL
+          - id: eld
+            name: ELD
+          - id: mte-ministere-de-la-transition-ecologique
+            name: MTE - Ministere de la Transition Ecologique
+          - id: cstb
+            name: CSTB
+          - id: bnpe
+            name: BNPE
+          - id: rte
+            name: RTE
+          - id: enedis
+            name: Enedis
+          - id: edf-sei
+            name: EDF SEI
+          - id: ofb
+            name: OFB
+          - id: atmo
+            name: Atmo
+          - id: anct
+            name: ANCT
+      - name: Cas d'usage
+        id: usage
+        color: yellow-tournesol-main-731
+        values:
+          - id: tdb-mobilite-durable
+            name: Indicateurs Tableau de bord de mobilité Durable
+          - id: territoires-en-transitions
+            name:
+              Indicateurs du programme Territoire Engagé de l'ADEME (Territoires en
+              Transitions)
+          - id: cop-region
+            name: Indicateurs de planification écologique régionale (COPs)

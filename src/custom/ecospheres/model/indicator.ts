@@ -57,9 +57,3 @@ export type IndicatorFilters = {
   producteur: string | null
   usage: string | null
 }
-
-export interface IndicatorTag {
-  color: string
-  value: string
-  type: string
-}

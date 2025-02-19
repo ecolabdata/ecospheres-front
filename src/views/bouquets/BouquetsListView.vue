@@ -13,10 +13,11 @@ import {
   AccessibilityPropertiesKey,
   type AccessibilityPropertiesType
 } from '@/model/injectionKeys'
-import { NoOptionSelected } from '@/model/theme'
+import type { ResolvedTag } from '@/model/tag'
 import { useUserStore } from '@/store/UserStore'
 import { fromMarkdown } from '@/utils'
 import { debounceWait, useTopicsConf } from '@/utils/config'
+import { useTagFromId } from '@/utils/tags'
 
 const { topicsSlug, topicsName } = useTopicsConf()
 
@@ -30,11 +31,11 @@ const props = defineProps({
   },
   theme: {
     type: String,
-    default: NoOptionSelected
+    default: null
   },
   subtheme: {
     type: String,
-    default: NoOptionSelected
+    default: null
   },
   geozone: {
     type: String,
@@ -43,12 +44,20 @@ const props = defineProps({
   drafts: {
     type: String,
     default: null
+  },
+  page: {
+    type: String,
+    default: null
+  },
+  sort: {
+    type: String,
+    required: true
   }
 })
 
 const banner = config.website.topics.banner
-const selectedTheme = ref(NoOptionSelected)
-const selectedSubtheme = ref(NoOptionSelected)
+const selectedTheme: Ref<ResolvedTag | null> = ref(null)
+const selectedSubtheme: Ref<ResolvedTag | null> = ref(null)
 const selectedGeozone: Ref<string | null> = ref(null)
 const selectedQuery = ref('')
 const showDrafts = ref(false)
@@ -65,16 +74,13 @@ const breadcrumbList = computed(() => {
   const links: BreadcrumbItem[] = []
   links.push({ text: 'Accueil', to: '/' })
   links.push({ text: `${capitalize(topicsName)}s`, to: `/${topicsSlug}` })
-  if (selectedTheme.value !== NoOptionSelected && selectedTheme.value !== '') {
+  if (selectedTheme.value && selectedTheme.value) {
     links.push({
-      text: selectedTheme.value,
-      to: `/${topicsSlug}?theme=${selectedTheme.value}&subtheme=${NoOptionSelected}`
+      text: selectedTheme.value.name,
+      to: `/${topicsSlug}?theme=${selectedTheme.value.id}`
     })
-    if (
-      selectedSubtheme.value !== NoOptionSelected &&
-      selectedSubtheme.value !== ''
-    ) {
-      links.push({ text: selectedSubtheme.value })
+    if (selectedSubtheme.value) {
+      links.push({ text: selectedSubtheme.value.name })
     }
   }
   return links
@@ -123,8 +129,12 @@ const search = useDebounceFn(() => {
 watch(
   props,
   () => {
-    selectedTheme.value = props.theme
-    selectedSubtheme.value = props.subtheme
+    selectedTheme.value = useTagFromId('bouquets', 'theme', props.theme)
+    selectedSubtheme.value = useTagFromId(
+      'bouquets',
+      'subtheme',
+      props.subtheme
+    )
     selectedGeozone.value = props.geozone
     selectedQuery.value = props.query
     showDrafts.value = props.drafts === '1'
@@ -185,8 +195,8 @@ watch(
               Filtres
             </h2>
             <BouquetSearch
-              :theme-name="selectedTheme"
-              :subtheme-name="selectedSubtheme"
+              :theme="selectedTheme?.id"
+              :subtheme="selectedSubtheme?.id"
               :geozone="selectedGeozone"
               :show-drafts="showDrafts"
               @vue:updated="setLiveResults"
@@ -196,11 +206,13 @@ watch(
         <div className="fr-col-12 fr-col-md-8">
           <BouquetList
             ref="bouquetListComp"
-            :theme-name="selectedTheme"
-            :subtheme-name="selectedSubtheme"
+            :theme="selectedTheme?.id"
+            :subtheme="selectedSubtheme?.id"
             :show-drafts="showDrafts"
             :geozone="geozone"
             :query="selectedQuery"
+            :page="props.page ? props.page : '1'"
+            :sort="props.sort"
             @clear-filters="setLiveResults"
           />
         </div>

@@ -1,17 +1,6 @@
+import { type FilterItemConf } from '@/model/config'
 import { type IndicatorFilters } from './indicator'
 
-export interface FilterConf {
+export type IndicatorFilterConf = FilterItemConf & {
   id: keyof IndicatorFilters
-  name: string
-  color: string
-  values: {
-    id: string
-    name: string
-  }[]
-}
-
-export interface IndicatorsConf {
-  global_tag_prefix: string
-  organization_id: string
-  filters: FilterConf[]
 }

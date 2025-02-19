@@ -6,7 +6,6 @@ import type {
   SpatialField
 } from '@/model/spatial'
 import type { Topic, TopicPostData } from '@/model/topic'
-import SpatialAPI from '@/services/api/SpatialAPI'
 import { useSpatialStore } from '@/store/SpatialStore'
 import type { DatasetV2 } from '@datagouv/components'
 
@@ -14,10 +13,10 @@ export const getZoneFromSpatial = async (
   spatial: SpatialField | undefined | null
 ): Promise<SpatialCoverage | undefined> => {
   if (spatial == null) return
+  const store = useSpatialStore()
   const zoneId = spatial.zones != null ? spatial.zones[0] : undefined
   if (zoneId !== undefined) {
-    const api = new SpatialAPI()
-    return await api.getZone(zoneId)
+    return await store.loadZone(zoneId)
   }
 }
 

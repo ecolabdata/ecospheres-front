@@ -233,7 +233,7 @@ website:
   # display settings
   pagination_sizes:
     organizations_list: 9
-    topics_list: 100
+    topics_list: 20
     files_list: 6
   home_banner_colors:
     - '#DDE6FF'

@@ -27,7 +27,7 @@ defineProps({
   },
   defaultOption: {
     type: String,
-    default: 'Tous'
+    default: null
   }
 })
 
@@ -37,7 +37,7 @@ const id = getRandomId('select')
 <template>
   <label :class="labelClass" :for="id">{{ label }}</label>
   <select :id="id" v-model="selectedOption" class="fr-select fr-col">
-    <option :value="null">
+    <option v-if="defaultOption" :value="null">
       {{ defaultOption }}
     </option>
     <option v-for="option in options" :key="option.id" :value="option.id">

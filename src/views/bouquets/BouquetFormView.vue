@@ -12,13 +12,13 @@ import {
   AccessibilityPropertiesKey,
   type AccessibilityPropertiesType
 } from '@/model/injectionKeys'
-import { NoOptionSelected } from '@/model/theme'
 import type { Topic, TopicPostData } from '@/model/topic'
 import { useRouteParamsAsString, useRouteQueryAsString } from '@/router/utils'
 import { useTopicStore } from '@/store/TopicStore'
 import { useUserStore } from '@/store/UserStore'
 import { cloneTopic } from '@/utils/bouquet'
 import { useTopicsConf } from '@/utils/config'
+import { useTagSlug } from '@/utils/tags'
 
 const props = defineProps({
   isCreate: {
@@ -41,14 +41,24 @@ const {
   topicsSecondaryTheme
 } = useTopicsConf()
 
-const topic: Ref<Partial<TopicPostData> & Pick<TopicPostData, 'extras'>> = ref({
+// populate tags from theme and subtheme in query string
+const selectedTags = [
+  routeQuery.theme
+    ? useTagSlug('bouquets', 'theme', routeQuery.theme || undefined)
+    : undefined,
+  routeQuery.subtheme
+    ? useTagSlug('bouquets', 'subtheme', routeQuery.subtheme || undefined)
+    : undefined
+]
+
+const topic: Ref<
+  Partial<TopicPostData> & Pick<TopicPostData, 'extras' | 'tags'>
+> = ref({
   private: true,
-  tags: [config.universe.name],
+  tags: [config.universe.name, ...selectedTags.filter((v) => !!v)],
   spatial: routeQuery.geozone ? { zones: [routeQuery.geozone] } : undefined,
   extras: {
     [topicsExtrasKey]: {
-      theme: routeQuery.theme || NoOptionSelected,
-      subtheme: routeQuery.subtheme || NoOptionSelected,
       datasets_properties: []
     }
   }
