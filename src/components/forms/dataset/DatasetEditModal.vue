@@ -11,6 +11,8 @@ import {
 } from '@/model/topic'
 import { useDatasetStore } from '@/store/DatasetStore'
 
+import { useForm, type AllowedInput } from '@/utils/form'
+import type { DsfrButtonGroupProps } from '@gouvminint/vue-dsfr'
 import DatasetPropertiesFields from './DatasetPropertiesFields.vue'
 
 export interface DatasetEditModalType {
@@ -37,28 +39,64 @@ const modalData: Ref<DatasetModalData> = ref({
   mode: 'edit'
 })
 
-const modalActions = computed(() => {
+const formErrors: Ref<AllowedInput[]> = ref([])
+
+const validateFields = () => {
+  if (!modalData.value.dataset?.title.trim()) {
+    formErrors.value.push('title')
+  }
+  if (!modalData.value.dataset?.purpose.trim()) {
+    formErrors.value.push('purpose')
+  }
+  if (
+    modalData.value.dataset?.group &&
+    modalData.value.dataset?.group.trim().length > 100
+  ) {
+    formErrors.value.push('group')
+  }
+  if (
+    !modalData.value.dataset?.uri &&
+    modalData.value.dataset?.availability === Availability.LOCAL_AVAILABLE
+  ) {
+    formErrors.value.push('availability')
+  }
+  if (
+    !modalData.value.dataset?.uri &&
+    modalData.value.dataset?.availability === Availability.URL_AVAILABLE
+  ) {
+    formErrors.value.push('availabilityUrl')
+  }
+}
+
+const modalActions: Ref<DsfrButtonGroupProps['buttons']> = computed(() => {
   return [
     {
       label: 'Annuler',
       type: 'button',
       secondary: true,
       onClick: () => {
-        closeModal()
+        onCancel()
       }
     },
     {
       label: 'Enregistrer',
       type: 'button',
-      disabled: !modalData.value.isValid,
       onClick: ($event: MouseEvent) => {
         $event.preventDefault()
-        submitModal(modalData.value)
-        closeModal()
+        handleSubmit()
       }
     }
   ]
 })
+
+const errorSummary = useTemplateRef('errorSummary')
+
+const onCancel = () => {
+  // reset error fields
+  formErrors.value = []
+  isSubmitted.value = false
+  closeModal()
+}
 
 const editDataset = (dataset: DatasetProperties, index: number) => {
   // clone the object to enable cancellation
@@ -87,7 +125,7 @@ const addDataset = () => {
   isModalOpen.value = true
 }
 
-const submitModal = async (modalData: DatasetModalData) => {
+const submit = async (modalData: DatasetModalData) => {
   if (modalData.dataset !== undefined) {
     // check if data.gouv.fr URL and update metadata if needed
     if (
@@ -130,7 +168,15 @@ const submitModal = async (modalData: DatasetModalData) => {
     }
   }
   emits('submitModal')
+  closeModal()
 }
+
+const { formErrorMessagesMap, sortedErrors, isSubmitted, handleSubmit } =
+  useForm(formErrors, {
+    validateFields,
+    onSuccess: () => submit(modalData.value),
+    errorSummaryRef: errorSummary
+  })
 
 const closeModal = () => {
   isModalOpen.value = false
@@ -143,7 +189,7 @@ defineExpose({ addDataset, editDataset })
   <DsfrModal
     v-if="isModalOpen && modalData.dataset"
     size="lg"
-    class="bouquet-dataset-modal"
+    class="bouquet-dataset-modal form"
     :title="
       modalData.mode === 'edit'
         ? 'Éditer le jeu de données'
@@ -151,12 +197,20 @@ defineExpose({ addDataset, editDataset })
     "
     :opened="isModalOpen"
     aria-modal="true"
-    @close="closeModal"
+    @close="onCancel"
   >
+    <ErrorSummary
+      v-show="formErrors.length"
+      ref="errorSummary"
+      :form-error-messages-map
+      :form-errors="sortedErrors"
+      heading-level="h3"
+    />
     <form novalidate>
       <DatasetPropertiesFields
         v-model="modalData.dataset"
         v-model:groups-model="datasetsGroups"
+        v-model:errors-model="formErrors"
         :already-selected-datasets="datasets"
         @update-validation="(isValid: boolean) => (modalData.isValid = isValid)"
       />

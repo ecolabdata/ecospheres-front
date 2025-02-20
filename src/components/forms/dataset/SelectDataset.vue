@@ -20,6 +20,14 @@ const props = defineProps({
   alreadySelectedDatasets: {
     type: Array<DatasetProperties>,
     default: []
+  },
+  isInvalid: {
+    type: Boolean,
+    default: false
+  },
+  errorMessageId: {
+    type: String,
+    default: 'errors-availability'
   }
 })
 
@@ -85,6 +93,8 @@ const clear = () => {
     no-options-text="Aucun jeu de données trouvé, précisez ou élargissez votre recherche."
     :aria="{
       'aria-describedby': 'dataset-description',
+      'aria-errormessage': `${errorMessageId}`,
+      'aria-invalid': `${isInvalid ? true : undefined}`,
       // useless or unsupported https://github.com/vueform/multiselect/issues/436
       'aria-labelledby': null,
       'aria-multiselectable': null,

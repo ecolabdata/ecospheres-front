@@ -122,7 +122,7 @@ const computeUrlQuery = (
   }
 }
 
-const onSelectTopic = (topicId: string) => {
+const onSelectTopic = (topicId: string | number) => {
   router.push({
     path: '/datasets',
     query: computeUrlQuery({
@@ -132,7 +132,7 @@ const onSelectTopic = (topicId: string) => {
   })
 }
 
-const onSelectOrganization = (orgId: string) => {
+const onSelectOrganization = (orgId: string | number) => {
   router.push({
     path: '/datasets',
     query: computeUrlQuery({
@@ -259,14 +259,12 @@ onMounted(() => {
     </p>
     <div class="fr-col-md-12 fr-mb-2w">
       <SearchComponent
-        id="search-bouquet"
+        id="search-datasets"
         v-model="localQuery"
         :is-filter="true"
         search-label="Filtrer des données"
-        label="Filtrer des données"
         :search-endpoint="router.resolve({ name: 'datasets' }).href"
         @update:model-value="search()"
-        @search="$emit('search', $event)"
       />
     </div>
     <div v-if="topicItems" class="fr-col-md-12 fr-mb-2w">

@@ -119,6 +119,7 @@ onMounted(() => {
   <!-- Title -->
   <div class="fr-input-group">
     <DsfrInput
+      id="input-name"
       v-model="name"
       v-bind="nameAttrs"
       :label="`Sujet du ${topicsName} (obligatoire)`"
@@ -134,6 +135,7 @@ onMounted(() => {
   <!-- Description -->
   <div class="fr-input-group">
     <DsfrInput
+      id="input-description"
       v-model="description"
       v-bind="descriptionAttrs"
       is-textarea
@@ -177,9 +179,7 @@ onMounted(() => {
       v-bind="themeAttrs"
       class="fr-select"
       :aria-invalid="errors.theme && isSubmitted ? true : undefined"
-      :aria-describedby="
-        errors.theme && isSubmitted ? 'errors-theme' : undefined
-      "
+      aria-errormessage="errors-theme"
       @change="subtheme = ''"
     >
       <option value="" selected disabled hidden>
@@ -212,11 +212,8 @@ onMounted(() => {
       :disabled="!values.theme ? true : undefined"
       class="fr-select"
       :aria-invalid="errors.subtheme && isSubmitted ? true : undefined"
-      :aria-describedby="
-        errors.subtheme && isSubmitted
-          ? 'errors-subtheme subtheme-instructions'
-          : 'subtheme-instructions'
-      "
+      aria-describedby="subtheme-instructions"
+      aria-errormessage="errors-subtheme"
     >
       <option value="" selected disabled hidden>
         Choisir un {{ topicsSecondaryTheme }}

@@ -95,19 +95,21 @@ const clear = () => {
 </script>
 
 <template>
-  <DsfrInputGroup
-    v-if="isFilter"
-    :id="id"
-    v-model="selectedQuery"
-    :label="searchLabel"
-    class="filter-input"
-    :label-visible="labelVisible"
-    :placeholder="!labelVisible ? searchLabel : undefined"
-  >
-    <template #before-input>
-      <VIconCustom name="search-line" class="search-icon" />
-    </template>
-  </DsfrInputGroup>
+  <search v-if="isFilter">
+    <DsfrInputGroup
+      :id="id"
+      v-model="selectedQuery"
+      :label="searchLabel"
+      class="filter-input"
+      type="search"
+      :label-visible="labelVisible"
+      :placeholder="!labelVisible ? searchLabel : undefined"
+    >
+      <template #before-input>
+        <VIconCustom name="search-line" class="search-icon" />
+      </template>
+    </DsfrInputGroup>
+  </search>
 
   <DsfrSearchBar
     v-else-if="!dropdown.length"
