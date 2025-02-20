@@ -1,4 +1,4 @@
-import type { Rel } from '@datagouv/components'
+import type { Rel } from '@datagouv/components-next'
 
 import type { Reuse, ReuseResponse } from '@/model/reuse'
 import DatagouvfrAPI from '@/services/api/DatagouvfrAPI'

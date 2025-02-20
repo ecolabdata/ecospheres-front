@@ -6,7 +6,7 @@ import { useLoading } from 'vue-loading-overlay'
 import GenericContainer from '@/components/GenericContainer.vue'
 import config from '@/config'
 import { useOrganizationStore } from '@/store/OrganizationStore'
-import type { Organization } from '@datagouv/components'
+import type { Organization } from '@datagouv/components-next'
 
 const store = useOrganizationStore()
 const $loading = useLoading()

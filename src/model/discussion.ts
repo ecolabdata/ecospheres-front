@@ -1,4 +1,4 @@
-import type { User } from '@datagouv/components'
+import type { User } from '@datagouv/components-next'
 
 import type { GenericResponse } from './api'
 

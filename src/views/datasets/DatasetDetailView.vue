@@ -1,12 +1,9 @@
 <script setup lang="ts">
+import { AppLink, QualityComponent, ReadMore, Well } from '@datagouv/components'
 import {
-  AppLink,
-  InformationPanel,
-  OrganizationNameWithCertificate,
-  QualityComponent,
-  ReadMore,
-  Well
-} from '@datagouv/components'
+  DatasetInformationPanel,
+  OrganizationNameWithCertificate
+} from '@datagouv/components-next'
 import { storeToRefs } from 'pinia'
 import { computed, inject, onMounted, ref } from 'vue'
 
@@ -247,11 +244,9 @@ onMounted(() => {
           "
           :dataset="dataset"
         />
-        <InformationPanel
-          v-if="dataset && license"
-          :dataset="dataset"
-          :license="license"
-        />
+        <Suspense>
+          <DatasetInformationPanel v-if="dataset" :dataset="dataset" />
+        </Suspense>
       </DsfrTabContent>
     </DsfrTabs>
   </GenericContainer>

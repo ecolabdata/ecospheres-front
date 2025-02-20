@@ -1,4 +1,4 @@
-import type { Resource } from '@datagouv/components'
+import type { Resource } from '@datagouv/components-next'
 
 export interface ResourceType {
   id: string

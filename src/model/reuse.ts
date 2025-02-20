@@ -1,4 +1,4 @@
-import type { Owned } from '@datagouv/components'
+import type { Owned } from '@datagouv/components-next'
 
 import { useTopicsConf } from '@/utils/config'
 

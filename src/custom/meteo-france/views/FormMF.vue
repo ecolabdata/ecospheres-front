@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Resource } from '@datagouv/components'
 import { ResourceAccordion } from '@datagouv/components'
+import type { Resource } from '@datagouv/components-next'
 import { ref, type Ref } from 'vue'
 
 import config from '@/config'
@@ -183,7 +183,7 @@ function onSelectIndicateur(event: Event) {
       <template #label>Quelles données ?</template>
     </DsfrSelect>
 
-    <div class="select-classic" v-if="selectedDataset && showDep">
+    <div v-if="selectedDataset && showDep" class="select-classic">
       <label>Quel département ?</label>
       <select class="fr-select" @change="onSelectDep($event)">
         <option hidden>Choisir une option</option>
@@ -245,7 +245,7 @@ function onSelectIndicateur(event: Event) {
         et leurs noms.
       </p>
       <div>
-        <div class="code-api" v-if="selectedIndicateur">
+        <div v-if="selectedIndicateur" class="code-api">
           {{
             'https://www.data.gouv.fr/api/2/datasets/' +
             datasetSlug +
@@ -253,7 +253,7 @@ function onSelectIndicateur(event: Event) {
             selectedIndicateur
           }}
         </div>
-        <div class="code-api" v-else>
+        <div v-else class="code-api">
           {{
             'https://www.data.gouv.fr/api/2/datasets/' +
             datasetSlug +

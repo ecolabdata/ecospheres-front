@@ -1,4 +1,4 @@
-import type { Owned, Rel } from '@datagouv/components'
+import type { Owned, Rel } from '@datagouv/components-next'
 
 import type { SpatialField } from './spatial'
 

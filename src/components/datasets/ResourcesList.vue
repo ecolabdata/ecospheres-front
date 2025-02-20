@@ -2,7 +2,8 @@
 import config from '@/config'
 import type { ResourceData } from '@/model/resource'
 import { useResourceStore } from '@/store/ResourceStore'
-import { Pagination, ResourceAccordion } from '@datagouv/components'
+import { ResourceAccordion } from '@datagouv/components'
+import { Pagination } from '@datagouv/components-next'
 import type { DatasetV2 } from '@datagouv/components/ts'
 import { useLoading } from 'vue-loading-overlay'
 

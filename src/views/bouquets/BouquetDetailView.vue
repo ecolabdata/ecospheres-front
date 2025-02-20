@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { OrganizationNameWithCertificate, ReadMore } from '@datagouv/components'
+import {
+  OrganizationNameWithCertificate,
+  ReadMore
+} from '@datagouv/components-next'
 import { useHead } from '@unhead/vue'
 import type { Ref } from 'vue'
 import { computed, inject, ref, watch } from 'vue'

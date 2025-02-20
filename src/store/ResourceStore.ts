@@ -1,4 +1,4 @@
-import type { Rel } from '@datagouv/components'
+import type { Rel } from '@datagouv/components-next'
 import { defineStore } from 'pinia'
 
 import config from '@/config'

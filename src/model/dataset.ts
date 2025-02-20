@@ -1,4 +1,4 @@
-import type { DatasetV2 } from '@datagouv/components'
+import type { DatasetV2 } from '@datagouv/components-next'
 
 import type { GenericResponse } from './api'
 import type { DatasetProperties } from './topic'

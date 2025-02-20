@@ -3,8 +3,8 @@
 import type { DatasetV2Fix } from '@/model/DatasetV2Fix'
 import {
   OrganizationNameWithCertificate,
-  useOwnerName
-} from '@datagouv/components'
+  getOwnerName
+} from '@datagouv/components-next'
 import { computed } from 'vue'
 
 import { stripFromMarkdown } from '@/utils'
@@ -26,8 +26,6 @@ const props = defineProps({
     default: 'relative'
   }
 })
-
-const ownerName = useOwnerName(props.dataset)
 
 const thumbnail = computed(() => {
   if (props.dataset.organization)
@@ -82,7 +80,7 @@ const badgeClasse = computed(() => {
               :organization="dataset.organization"
             />
           </template>
-          <template v-else>{{ ownerName }}</template>
+          <template v-else>{{ getOwnerName(dataset) }}</template>
         </p>
         <p
           class="fr-mt-1w fr-mb-1w fr-hidden fr-unhidden-sm overflow-wrap-anywhere fr-text--sm"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DatasetV2 } from '@datagouv/components'
+import type { DatasetV2 } from '@datagouv/components-next'
 import { computed, onMounted, ref, watch, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 

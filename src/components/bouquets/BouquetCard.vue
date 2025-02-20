@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {
   formatRelativeIfRecentDate,
-  OrganizationNameWithCertificate,
-  useOwnerName
-} from '@datagouv/components'
+  getOwnerName,
+  OrganizationNameWithCertificate
+} from '@datagouv/components-next'
 import { toRef } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -31,8 +31,6 @@ const props = defineProps({
 
 const bouquetRef = toRef(props, 'bouquet')
 const spatialCoverage = useSpatialCoverage(bouquetRef)
-
-const ownerName = useOwnerName(props.bouquet)
 
 const { theme, subtheme, datasetsProperties } = useExtras(bouquetRef)
 
@@ -96,7 +94,7 @@ const { themeColors } = useThemeOptions(theme)
               :organization="bouquet.organization"
             />
           </template>
-          <template v-else>{{ ownerName }}</template>
+          <template v-else>{{ getOwnerName(bouquet) }}</template>
         </p>
       </div>
     </div>

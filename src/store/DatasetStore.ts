@@ -1,4 +1,4 @@
-import type { DatasetV2, License } from '@datagouv/components'
+import type { DatasetV2, License } from '@datagouv/components-next'
 import { defineStore } from 'pinia'
 
 import type { BaseParams } from '@/model/api'

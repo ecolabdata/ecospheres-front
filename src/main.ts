@@ -22,6 +22,7 @@ import 'vue3-toastify/dist/index.css'
 
 import config from '@/config'
 
+import { datagouv } from '@datagouv/components-next'
 import App from './App.vue'
 import './assets/main.css'
 import type { CustomParams } from './model/api'
@@ -34,6 +35,13 @@ const app = createApp(App)
 const pinia = createPinia()
 const i18n = setupI18n()
 const head = createHead()
+
+app.use(datagouv, {
+  name: 'data.gouv.fr',
+  baseUrl: config.datagouvfr.base_url,
+  apiBase: config.datagouvfr.base_url,
+  staticUrl: 'https://static.data.gouv.fr' // TODO add to config?
+})
 
 routerPromise
   .then((router) => {

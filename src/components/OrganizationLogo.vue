@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DatasetV2 } from '@datagouv/components'
+import type { DatasetV2 } from '@datagouv/components-next'
 import { computed } from 'vue'
 
 import config from '@/config'

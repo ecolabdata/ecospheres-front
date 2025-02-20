@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { InformationPanel, ReadMore } from '@datagouv/components'
+import { DatasetInformationPanel, ReadMore } from '@datagouv/components-next'
 import { computed, inject, onMounted, ref } from 'vue'
 
 import DiscussionsList from '@/components/DiscussionsList.vue'
@@ -150,7 +150,7 @@ onMounted(() => {
 
       <!-- Détails techniques -->
       <DsfrTabContent panel-id="tab-content-5" tab-id="tab-5">
-        <InformationPanel
+        <DatasetInformationPanel
           v-if="license"
           :dataset="indicator"
           :license="license"

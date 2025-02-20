@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DatasetV2 } from '@datagouv/components'
+import type { DatasetV2 } from '@datagouv/components-next'
 import { capitalize, computed, onMounted, ref } from 'vue'
 import { useLoading } from 'vue-loading-overlay'
 import { toast } from 'vue3-toastify'

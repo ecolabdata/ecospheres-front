@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type DatasetV2 } from '@datagouv/components'
+import { type DatasetV2 } from '@datagouv/components-next'
 import { onMounted, ref, type Ref } from 'vue'
 
 import DatasetEditModal, {

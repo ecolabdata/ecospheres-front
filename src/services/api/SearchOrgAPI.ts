@@ -1,4 +1,4 @@
-import type { Organization } from '@datagouv/components'
+import type { Organization } from '@datagouv/components-next'
 
 import DatagouvfrAPI from './DatagouvfrAPI'
 

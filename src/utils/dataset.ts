@@ -1,5 +1,5 @@
 import { useDatasetStore } from '@/store/DatasetStore'
-import type { DatasetV2, License } from '@datagouv/components'
+import type { DatasetV2, License } from '@datagouv/components-next'
 
 export const useLicense = (
   dataset: Ref<DatasetV2 | undefined>

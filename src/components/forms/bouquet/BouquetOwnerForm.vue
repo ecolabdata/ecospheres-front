@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Organization } from '@datagouv/components'
+import type { Organization } from '@datagouv/components-next'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch, type Ref } from 'vue'
 
