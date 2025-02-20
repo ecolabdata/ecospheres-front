@@ -2,14 +2,14 @@
 import type { Organization } from '@datagouv/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch, type Ref } from 'vue'
-import Multiselect from 'vue-multiselect'
-import 'vue-multiselect/dist/vue-multiselect.css'
 
-import '@/assets/multiselect.css'
+import Multiselect from '@vueform/multiselect'
+import '@vueform/multiselect/themes/default.css'
+
 import type { TopicPostData } from '@/model/topic'
 import SearchAPI from '@/services/api/SearchOrgAPI'
 import { useUserStore } from '@/store/UserStore'
-import { useTopicsConf } from '@/utils/config'
+import { debounceWait, useTopicsConf } from '@/utils/config'
 
 const topic = defineModel({
   type: Object as () => Partial<TopicPostData>,
@@ -60,19 +60,21 @@ const selectOptions = computed(() => {
 })
 
 const isLoading = ref(false)
-const options: Ref<Organization[]> = ref([])
 
 const search = useDebounceFn(async (query: string) => {
   isLoading.value = true
   if (!query) {
-    options.value = []
     isLoading.value = false
     return
   }
-  const organizations = await new SearchAPI().search(query, 10)
-  options.value = organizations
-  isLoading.value = false
-}, 400)
+  try {
+    return await new SearchAPI().search(query, 10)
+  } catch (error) {
+    console.error('Search error', error)
+  } finally {
+    isLoading.value = false
+  }
+}, debounceWait)
 
 const onSelectOwnOrganization = () => {
   if (selectedOwnOrganization.value) {
@@ -91,7 +93,7 @@ const onSelectAnyOrganization = () => {
 }
 
 const clear = () => {
-  selectedAnyOrganization.value = null
+  selectedAnyOrganization.value = undefined
 }
 
 watch(choice, () => {
@@ -110,7 +112,7 @@ watch(choice, () => {
       :legend="`Choisissez si vous souhaitez gérer ce ${topicsName}&nbsp;:`"
       name="owner"
     />
-    <div v-if="choice === 'organization'" class="organizations">
+    <div v-if="choice === 'organization'" class="flex-gap">
       <DsfrSelect
         id="ownerOrg"
         v-model="selectedOwnOrganization"
@@ -126,41 +128,54 @@ watch(choice, () => {
         >
         <Multiselect
           id="any-org-select-bouquet"
-          ref="multiselect"
           v-model="selectedAnyOrganization"
           role="search"
-          :options="options"
-          track-by="id"
+          :object="true"
+          value-prop="id"
+          label="title"
+          track-by="title"
+          class="fr-input-wrap"
+          :filter-results="false"
+          :min-chars="3"
+          :clear-on-search="true"
+          :delay="0"
+          :options="search"
           placeholder=""
-          select-label="Entrée pour sélectionner"
-          :multiple="false"
+          :resolve-on-load="false"
           :searchable="true"
-          :internal-search="false"
-          :loading="isLoading"
-          :clear-on-select="true"
-          :close-on-select="true"
-          :show-no-results="false"
-          :hide-selected="true"
-          :limit="3"
-          :options-limit="100"
-          @search-change="search"
+          :limit="10"
+          :strict="false"
+          :clear-on-blur="false"
+          :allow-absent="true"
+          no-options-text="Aucune organisation trouvée, précisez ou élargissez votre recherche."
+          :aria="{
+            // useless or unsupported yet https://github.com/vueform/multiselect/issues/436
+            'aria-labelledby': null,
+            'aria-multiselectable': null,
+            'aria-placeholder': null
+          }"
           @select="onSelectAnyOrganization()"
         >
-          <template #caret>
-            <div
-              v-if="selectedAnyOrganization"
-              class="multiselect__clear"
-              @mousedown.prevent.stop="clear"
-            />
+          <template #clear>
+            <button
+              class="multiselect-clear"
+              @click="clear"
+              @keydown.prevent.enter="clear"
+              @keydown.prevent.space="clear"
+            >
+              <span class="fr-sr-only">Supprimer la sélection</span>
+              <span aria-hidden class="multiselect-clear-icon"></span>
+            </button>
           </template>
-          <template #singleLabel="slotProps">
-            {{ slotProps.option.name }}
+
+          <template #singlelabel="{ value }">
+            <div class="multiselect-single-label fr-py-2w">
+              {{ value.name }}
+            </div>
           </template>
-          <template #option="slotProps">
-            {{ slotProps.option.name }}
-          </template>
-          <template #noOptions>
-            Précisez ou élargissez votre recherche
+
+          <template #option="{ option }">
+            <div class="spatial-select-option">{{ option.name }}</div>
           </template>
         </Multiselect>
       </div>
@@ -169,7 +184,7 @@ watch(choice, () => {
 </template>
 
 <style scoped>
-.organizations {
-  gap: 1rem;
+.flex-gap {
+  --gap: 1rem;
 }
 </style>

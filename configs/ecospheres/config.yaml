@@ -64,7 +64,7 @@ website:
     display: false
     name:
     link:
-  footer_phrase: "Ce site est une déclinaison thématique de data.gouv.fr sur les données relatives à la transition écologique et énergétique, réalisé par le Ministère en charge de l'environnement"
+  footer_phrase: "Ce site est une déclinaison thématique de data.gouv.fr sur les données relatives à la transition écologique et énergétique, réalisé par le ministère en charge de l'environnement"
   footer_external_links:
     - label: 'data.gouv.fr'
       href: 'https://www.data.gouv.fr'
@@ -129,6 +129,8 @@ website:
   list_search_topics:
   url_search_topics:
   oauth_option: true
+  # debounce high enough for accessibility (screen readers will announce results)
+  default_debounce_wait: 600
   pagination_sizes:
     organizations_list: 9
     topics_list: 100

@@ -47,9 +47,7 @@ const { themeColors } = useThemeOptions(theme)
 </script>
 
 <template>
-  <article
-    class="fr-my-1w fr-px-3w fr-py-2w border border-default-grey fr-enlarge-link"
-  >
+  <article class="fr-px-3w fr-py-2w border border-default-grey fr-enlarge-link">
     <div
       v-if="bouquet.private"
       class="absolute top-0 fr-grid-row fr-grid-row--middle fr-mt-n3v"
@@ -64,27 +62,26 @@ const { themeColors } = useThemeOptions(theme)
         />
       </div>
     </div>
-    <div class="fr-grid-row fr-pt-2v align-center flex-nowrap">
-      <div class="fr-col-12 fr-col-sm-2 bouquet-card-col-logo">
-        <OrganizationLogo
-          v-if="bouquet.organization"
-          :size="43"
-          :object="bouquet"
-        />
-        <div v-else class="border fr-p-1-5v fr-mr-1-5v inline-block">
-          <img
-            :src="getOwnerAvatar(bouquet)"
-            alt=""
-            loading="lazy"
-            class="owner-avatar"
-            height="42"
-            width="42"
-          />
-        </div>
-      </div>
-      <div
-        class="fr-col-12 fr-col-sm-10 fr-pl-2v overflow-hidden flex-1-1-auto"
-      >
+    <div
+      class="fr-mt-2v fr-grid-row align-center flex-nowrap flex-gap owner-info"
+    >
+      <OrganizationLogo
+        v-if="bouquet.organization"
+        :size="42"
+        :object="bouquet"
+      />
+
+      <img
+        v-else
+        :src="getOwnerAvatar(bouquet)"
+        alt=""
+        loading="lazy"
+        class="border fr-p-1-5v owner-avatar"
+        height="56"
+        width="56"
+      />
+
+      <div class="overflow-hidden flex-1-1-auto">
         <h3 class="fr-mb-1v fr-grid-row h4">
           <RouterLink :to="bouquetLink" class="text-grey-500">
             {{ bouquet.name }}
@@ -92,9 +89,8 @@ const { themeColors } = useThemeOptions(theme)
         </h3>
         <p
           v-if="bouquet.organization || bouquet.owner"
-          class="fr-m-0 fr-text--sm"
+          class="fr-m-0 fr-text--sm org--fix"
         >
-          Par
           <template v-if="bouquet.organization">
             <OrganizationNameWithCertificate
               :organization="bouquet.organization"
@@ -116,8 +112,8 @@ const { themeColors } = useThemeOptions(theme)
       Mis à jour {{ formatRelativeIfRecentDate(bouquet.last_modified) }}
     </p>
 
-    <div class="fr-grid-row">
-      <span class="fr-tag fr-mr-2v fr-mb-2v">
+    <div class="fr-grid-row flex-gap">
+      <span class="fr-tag">
         <VIconCustom
           name="database-line"
           class="fr-mr-1v"
@@ -131,7 +127,7 @@ const { themeColors } = useThemeOptions(theme)
         </span>
       </span>
 
-      <span v-if="spatialCoverage" class="fr-tag fr-mb-2v">
+      <span v-if="spatialCoverage" class="fr-tag">
         <VIconCustom
           name="road-map-line"
           class="fr-mr-1v"
@@ -147,9 +143,20 @@ const { themeColors } = useThemeOptions(theme)
 </template>
 
 <style scoped>
+article {
+  background-color: var(--background-default-grey);
+}
+.owner-info {
+  --gap: 0.75rem;
+  .fr-text--sm {
+    line-height: 1.4 !important;
+  }
+  & > :first-child {
+    flex: 0 0 auto;
+  }
+}
 .owner-avatar {
-  margin-bottom: -6px;
-  display: inline-block;
+  background-color: #fff;
 }
 .card__tag {
   color: v-bind('themeColors.color');
@@ -166,15 +173,12 @@ const { themeColors } = useThemeOptions(theme)
   line-height: inherit;
 }
 
-.bouquet-card-col-logo {
-  max-width: 4.25rem;
-}
-
 .description p {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 </style>

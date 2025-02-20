@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import GenericContainer from '@/components/GenericContainer.vue'
 import type { BreadcrumbItem } from '@/model/breadcrumb'
+import { debounceWait } from '@/utils/config'
 import IndicatorList from '../../components/indicators/IndicatorList.vue'
 import IndicatorSearch from '../../components/indicators/IndicatorSearch.vue'
 import { FILTER_KEYS, type IndicatorFilters } from '../../model/indicator'
@@ -52,7 +53,7 @@ const search = useDebounceFn((query) => {
     query: { ...route.query, q: query },
     hash: '#indicators-list'
   })
-}, 600)
+}, debounceWait)
 </script>
 
 <template>

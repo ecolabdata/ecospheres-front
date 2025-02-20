@@ -128,13 +128,9 @@ defineExpose({
       </div>
     </div>
   </div>
-  <div class="indicators-list-container fr-container fr-mb-4w border-top">
-    <ul class="fr-grid-row fr-grid-row--gutters fr-mb-1w fr-mt-2w" role="list">
-      <li
-        v-for="indicator in indicators"
-        :key="indicator.id"
-        class="fr-col-md-6 fr-col-md"
-      >
+  <div class="fr-mb-4w border-top">
+    <ul class="fr-grid-row flex-gap fr-mt-3w fr-pl-0" role="list">
+      <li v-for="indicator in indicators" :key="indicator.id" class="col-fluid">
         <IndicatorCard :indicator="indicator" />
       </li>
     </ul>
@@ -149,9 +145,12 @@ defineExpose({
 </template>
 
 <style scoped>
-/* "revert" gutters — simpler than w/o gutters */
-.indicators-list-container {
-  padding-right: 0;
-  padding-left: 0;
+.fr-grid-row {
+  --gap: 1rem;
+}
+.col-fluid {
+  padding: 0;
+  flex: 1 1 48%;
+  min-inline-size: 30ch;
 }
 </style>

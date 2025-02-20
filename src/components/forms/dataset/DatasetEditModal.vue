@@ -41,6 +41,7 @@ const modalActions = computed(() => {
   return [
     {
       label: 'Annuler',
+      type: 'button',
       secondary: true,
       onClick: () => {
         closeModal()
@@ -48,6 +49,7 @@ const modalActions = computed(() => {
     },
     {
       label: 'Enregistrer',
+      type: 'button',
       disabled: !modalData.value.isValid,
       onClick: ($event: MouseEvent) => {
         $event.preventDefault()

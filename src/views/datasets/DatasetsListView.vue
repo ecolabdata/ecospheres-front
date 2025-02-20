@@ -24,7 +24,7 @@ import { useOrganizationStore } from '@/store/OrganizationStore'
 import { useSearchStore } from '@/store/SearchStore'
 import { useTopicStore } from '@/store/TopicStore'
 import { fromMarkdown } from '@/utils'
-import { useTopicsConf } from '@/utils/config'
+import { debounceWait, useTopicsConf } from '@/utils/config'
 
 defineEmits(['search'])
 const props = defineProps({
@@ -203,7 +203,7 @@ const delayedSearch = useDebounceFn(
         loadingInstance.hide()
       })
   },
-  600
+  debounceWait
 )
 
 watch(

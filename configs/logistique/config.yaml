@@ -120,6 +120,8 @@ website:
     display: false
     content: Notice avec un [lien beta](/beta) et du _style_
     closeable: false
+  # debounce high enough for accessibility (screen readers will announce results)
+  default_debounce_wait: 600
   # display settings
   pagination_sizes:
     organizations_list: 9
@@ -160,9 +162,7 @@ website:
     activate_read_more: false
     dataset_editorialization: true
     can_add_topics:
-      everyone: false
-      authorized_users:
-        - 57d0546ec751df5cda97bae5
+      everyone: yes
 themes:
   - name: Immobilier logistique
     color: '#043574'

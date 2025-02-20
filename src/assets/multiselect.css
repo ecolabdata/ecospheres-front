@@ -1,108 +1,67 @@
-.multiselect__option,
-.multiselect__single {
-  white-space: normal;
-  h4 {
-    font-size: 1.2rem;
-  }
-}
-.multiselect__option--highlight {
-  background-color: var(--background-alt-grey-active);
-  color: var(--text-default-grey);
-}
-.multiselect__option--highlight::after {
-  background-color: var(--background-alt-grey-active);
-  color: var(--text-default-grey);
-}
-.multiselect__spinner::before,
-.multiselect__spinner::after {
-  border-color: var(--background-alt-grey-active) transparent transparent;
-  top: 60%;
-}
-.multiselect__select {
-  --data-uri-svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23161616' d='m12 13.1 5-4.9 1.4 1.4-6.4 6.3-6.4-6.4L7 8.1l5 5z'/%3E%3C/svg%3E");
-  background-image: var(--data-uri-svg);
-  background-position: calc(100% - 1rem) 50%;
-  background-repeat: no-repeat;
-  background-size: 1rem 1rem;
-  .multiselect--active & {
-    transform: none;
-  }
-}
-.multiselect__select::before {
-  content: unset;
-}
-.multiselect__clear {
-  position: absolute;
-  right: 15px;
-  height: 40px;
-  width: 40px;
-  display: block;
-  cursor: pointer;
-  z-index: 3;
-
-  &:before,
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    width: 3px;
-    height: 16px;
-    background-color: var(--border-plain-grey);
-    top: 30%;
-    right: 4px;
-  }
-
-  &:before {
-    transform: rotate(45deg);
-  }
-
-  &:after {
-    transform: rotate(-45deg);
-  }
-}
 .multiselect {
+  --ms-max-height: 20rem;
   --ms-bg: var(--background-contrast-grey);
+  --ms-spinner-color: var(--blue-cumulus-sun-368-moon-732);
+  --ms-option-bg-selected: var(--blue-cumulus-sun-368-moon-732);
+  --ms-option-bg-pointed: var(--blue-cumulus-sun-368-moon-732);
+  --ms-option-color-pointed: var(--background-contrast-grey);
+  --ms-option-bg-selected-pointed: var(--blue-cumulus-sun-368-moon-732-hover);
+  &&,
+  &&.is-active {
+    border: none;
+    box-shadow: none;
+  }
+  .multiselect-caret {
+    --ms-px: 1rem;
+    --data-uri-svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23161616' d='m12 13.1 5-4.9 1.4 1.4-6.4 6.3-6.4-6.4L7 8.1l5 5z'/%3E%3C/svg%3E");
+    -webkit-mask-image: var(--data-uri-svg);
+    mask-image: var(--data-uri-svg);
+    width: 1.1rem;
+    transition: none;
+  }
+  .multiselect-caret.is-open {
+    transform: none;
+    transition: none;
+  }
+  .multiselect-option {
+    position: relative;
+
+    &:has(button) {
+      padding: 0;
+    }
+
+    button {
+      --hover-tint: inherit;
+      --active-tint: var(--background-action-high-blue-france-active);
+      padding: 0.75rem;
+      block-size: 100%;
+      inline-size: 100%;
+      text-align: left;
+
+      &:focus {
+        outline-offset: -4px;
+      }
+    }
+
+    &.is-pointed {
+      button:focus {
+        outline-color: var(--background-default-grey);
+      }
+    }
+  }
+  .multiselect-dropdown {
+    overflow-y: auto;
+  }
 }
 .multiselect:has(.multiselect-single-label .card) {
   --ms-bg: var(--background-default-grey);
+  border: 1px solid var(--background-contrast-grey);
 }
 .multiselect-wrapper {
   --ms-radius: 0.25rem 0.25rem 0 0;
   --ms-caret-color: var(--border-plain-grey);
 }
+/* dsfr-input style */
 .multiselect-search {
   box-shadow: inset 0 -2px 0 0 var(--border-plain-grey);
-}
-.multiselect__tags {
-  --idle: transparent;
-  --hover: var(--background-contrast-grey-hover);
-  --active: var(--background-contrast-grey-active);
-  appearance: none;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  background-color: var(--background-contrast-grey);
-  border: 0;
-  box-shadow: inset 0 -2px 0 0 var(--border-plain-grey);
-  color: var(--text-title-grey);
-  display: block;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  padding: 0.5rem 2.5rem 0.5rem 1rem;
-  width: 100%;
-  border-radius: 0.25rem 0.25rem 0 0;
-  & > .multiselect__single {
-    padding: 0;
-    background-color: var(--background-contrast-grey);
-  }
-}
-.multiselect__tags:focus-within {
-  outline: 2px solid #0a76f6;
-  outline-offset: -2px;
-}
-.multiselect__input {
-  padding: 0;
-  background-color: transparent;
-}
-.multiselect__placeholder {
-  color: var(--text-default-grey);
 }

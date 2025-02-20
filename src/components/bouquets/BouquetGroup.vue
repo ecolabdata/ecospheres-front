@@ -422,6 +422,7 @@ const actions = computed(() => {
 
 /* MODAL */
 .modal-group :deep(h1) {
+  /* Fluid font-size. Maths from: https://utopia.fyi/type/calculator/ */
   font-size: clamp(1.375rem, 1.3319rem + 0.2155vw, 1.5rem);
 }
 .modal-group form {

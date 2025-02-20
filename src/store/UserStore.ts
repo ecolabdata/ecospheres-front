@@ -70,7 +70,7 @@ export const useUserStore = defineStore('user', {
             this.logout()
             LocalStorageService.setItem(
               'lastRoute',
-              this.$router.currentRoute.value
+              this.$router.currentRoute.value.fullPath
             )
             await this.$router.push({ name: 'login' })
           }

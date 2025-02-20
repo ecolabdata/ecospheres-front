@@ -94,7 +94,8 @@ export const useTopicStore = defineStore('topic', {
           page_size: config.website.pagination_sizes.topics_list,
           tag: config.universe.name,
           include_private: 'yes'
-        }
+        },
+        authenticated: true
       })
       await useUserStore().waitForStoreInit()
       this.data = this.filter(response.data)

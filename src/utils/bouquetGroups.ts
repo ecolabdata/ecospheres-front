@@ -3,6 +3,8 @@ import { type ComputedRef, type Ref, ref } from 'vue'
 
 import type { DatasetProperties, DatasetsGroups } from '@/model/topic'
 
+import { debounceWait } from '@/utils/config'
+
 export const NO_GROUP = 'Sans regroupement'
 
 export const isOnlyNoGroup = (groups: DatasetsGroups) => {
@@ -147,7 +149,7 @@ export function useDatasetFilter(datasetsProperties: Ref<DatasetProperties[]>) {
   // apply search query
   const filterDatasetsProperties = useDebounceFn((value: string) => {
     searchQuery.value = value
-  }, 600)
+  }, debounceWait)
 
   return {
     isFiltering,

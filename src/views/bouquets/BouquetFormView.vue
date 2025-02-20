@@ -214,7 +214,7 @@ const onSubmit = async () => {
       <h1 class="fr-col-auto fr-mb-2v">
         {{ isCreate ? `Nouveau ${topicsName}` : topic.name }}
       </h1>
-      <form novalidate>
+      <form novalidate @submit.prevent>
         <div
           v-show="formErrors.length"
           class="fr-my-4w fr-p-2w error-status"
@@ -252,7 +252,7 @@ const onSubmit = async () => {
             @update-validation="(isValid: boolean) => (canSave = isValid)"
           />
         </fieldset>
-        <fieldset>
+        <fieldset v-if="isCreate">
           <legend class="fr-fieldset__legend fr-text--lead">
             Propriétaire du {{ topicsName }}
           </legend>
@@ -261,6 +261,7 @@ const onSubmit = async () => {
         <div class="fr-mt-4w fr-grid-row fr-grid-row--right">
           <DsfrButton
             v-if="!isCreate"
+            type="button"
             secondary
             class="fr-mb-1w"
             label="Supprimer"
@@ -268,12 +269,14 @@ const onSubmit = async () => {
             @click.prevent="destroy"
           />
           <DsfrButton
+            type="button"
             secondary
             class="fr-mb-1w fr-ml-1w"
             label="Annuler"
             @click.prevent="cancel"
           />
           <DsfrButton
+            type="button"
             class="fr-mb-1w fr-ml-1w"
             label="Enregistrer"
             @click.prevent="onSubmit"

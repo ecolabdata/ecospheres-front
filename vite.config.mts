@@ -34,8 +34,8 @@ export default defineConfig(({ mode }) => {
   return {
     base: '/',
     plugins: [
-      vue(),
       vueDevTools(),
+      vue(),
       AutoImport({
         include: [/\.[tj]sx?$/, /\.vue$/, /\.vue\?vue/],
         imports: [

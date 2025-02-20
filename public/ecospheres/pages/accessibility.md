@@ -1,6 +1,6 @@
 # Déclaration d’accessibilité
 
-Le Ministère en charge de l&rsquo;environnement s’engage à rendre son service accessible, conformément à l’article 47 de la loi n°&nbsp;2005-102 du 11 février 2005.
+Le ministère en charge de l&rsquo;environnement s’engage à rendre son service accessible, conformément à l’article 47 de la loi n°&nbsp;2005-102 du 11 février 2005.
 
 Cette déclaration d’accessibilité s’applique à **ecologie.data.gouv.fr** (https://ecologie.data.gouv.fr).
 

@@ -154,7 +154,7 @@ defineExpose({
             Vous pouvez aussi contribuer en créant un {{ topicsName }}.
           </p>
         </div>
-        <div class="fr-grid-row fr-grid-row--undefined">
+        <div class="fr-grid-row">
           <button class="fr-btn" @click.stop.prevent="clearFilters">
             Réinitialiser les filtres
           </button>
@@ -170,8 +170,8 @@ defineExpose({
       </div>
     </div>
   </div>
-  <div class="bouquets-list-container fr-container fr-mb-4w border-top">
-    <ul class="fr-mt-3w fr-pl-0" role="list">
+  <div class="fr-mb-4w border-top">
+    <ul class="fr-grid-row flex-gap fr-mt-3w fr-pl-0" role="list">
       <li v-for="bouquet in bouquets" :key="bouquet.id" class="fr-col-12">
         <BouquetCard :bouquet="bouquet" />
       </li>
@@ -180,9 +180,7 @@ defineExpose({
 </template>
 
 <style scoped>
-/* "revert" gutters — simpler than w/o gutters */
-.bouquets-list-container {
-  padding-right: 0;
-  padding-left: 0;
+.fr-grid-row {
+  --gap: 1rem;
 }
 </style>

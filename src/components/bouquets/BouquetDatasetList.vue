@@ -137,7 +137,7 @@ onMounted(() => {
 
 <template>
   <!-- Header and buttons -->
-  <div class="list-header fr-grid-row fr-grid-row--middle justify-between">
+  <div class="flex-gap fr-grid-row fr-grid-row--middle justify-between">
     <h2 class="fr-col-auto fr-m-0">
       Composition du {{ topicsName }} de données
     </h2>
@@ -262,8 +262,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.list-header {
-  gap: 1rem;
+.flex-gap {
+  --gap: 1rem;
 }
 details {
   border-block: 1px solid var(--border-default-grey, #ddd);

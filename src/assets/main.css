@@ -5,6 +5,7 @@
   --blue-france-950-100: var(--blue-cumulus-950-100);
   --blue-france-950-100-hover: var(--blue-cumulus-950-100-hover);
   --blue-france-950-100-active: var(--blue-cumulus-950-100-active);
+  --blue-france-sun-113: #000091;
   --blue-france-sun-113-625: var(--blue-cumulus-sun-368-moon-732);
   --blue-france-sun-113-625-hover: var(--blue-cumulus-sun-368-moon-732-hover);
   --blue-france-sun-113-625-active: var(--blue-cumulus-sun-368-moon-732-active);
@@ -99,7 +100,7 @@ body {
 }
 
 .actionTile {
-  background: #000092;
+  background: var(--blue-france-sun-113);
   .fr-tile__link {
     color: white;
   }
@@ -185,6 +186,10 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.datagouv-components :where(.fr-link, a:not(.fr-btn)) {
+  color: var(--blue-france-sun-113);
+}
+
 /* Button color contrast fix */
 .fr-btn:not(
     .fr-btn--close,
@@ -199,7 +204,6 @@ body {
 }
 
 /* DSFR search bar fix */
-
 .datagouv-components .fr-search-bar .fr-btn {
   border-radius: 0 0.25rem 0 0;
 }
@@ -209,4 +213,23 @@ body {
   p:last-child {
     margin-bottom: 0;
   }
+}
+
+/* DSFR org name in card fix */
+/* remove default margins */
+.org--fix div.fr-mx-1v {
+  margin: 0 !important;
+}
+/* gap to add margins when needed */
+.org--fix .inline-flex {
+  gap: 0.25rem;
+}
+/* sometimes the first span is empty, hide it */
+.org--fix .inline-flex span:first-of-type:empty {
+  display: none;
+}
+
+/* Flex gap utility (missing from DSFR) */
+.flex-gap {
+  gap: var(--gap, 0.5rem);
 }

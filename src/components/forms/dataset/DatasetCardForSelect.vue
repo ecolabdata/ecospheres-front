@@ -75,9 +75,8 @@ const badgeClasse = computed(() => {
         </h4>
         <p
           v-if="dataset.organization || dataset.owner"
-          class="fr-m-0 fr-text--xs"
+          class="fr-m-0 fr-text--xs org--fix"
         >
-          Par
           <template v-if="dataset.organization">
             <OrganizationNameWithCertificate
               :organization="dataset.organization"

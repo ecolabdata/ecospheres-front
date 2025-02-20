@@ -226,7 +226,7 @@ watch(
             <DsfrTag label="Brouillon" />
           </div>
           <div
-            class="fr-mt-1v fr-col-auto fr-grid-row fr-grid-row--middle bouquet-actions"
+            class="fr-mt-1v fr-col-auto fr-grid-row fr-grid-row--middle flex-gap"
           >
             <DsfrButton
               v-if="canClone"
@@ -361,9 +361,6 @@ watch(
   display: flex;
   align-items: center;
   flex-flow: wrap;
-}
-.bouquet-actions {
-  gap: 0.5rem;
 }
 
 .flex-reverse {

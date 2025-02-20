@@ -10,7 +10,7 @@ defineProps<Props>()
 </script>
 
 <template>
-  <div v-if="items" class="fr-mb-3w">
+  <div v-if="items && items.length > 0" class="fr-mb-3w">
     <h3 class="subtitle fr-mb-2v">{{ title }}</h3>
     <ul v-if="items.length > 1" class="fr-mb-0">
       <!-- eslint-disable-next-line vue/no-v-html -->

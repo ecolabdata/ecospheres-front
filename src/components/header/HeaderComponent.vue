@@ -1,310 +1,158 @@
 <script lang="ts" setup>
-import { UseFocusTrap } from '@vueuse/integrations/useFocusTrap/component'
-import {
-  computed,
-  onMounted,
-  onUnmounted,
-  ref,
-  useSlots,
-  type StyleValue
-} from 'vue'
-
 import config from '@/config'
+import type { DsfrHeaderProps } from '@gouvminint/vue-dsfr'
+import Navigation from '../Navigation.vue'
 import SearchComponent from '../SearchComponent.vue'
-import type { DsfrHeaderMenuLinkProps } from './DsfrHeaderMenuLink.vue'
 
-type DsfrHeaderProps = {
-  serviceTitle?: string
-  serviceDescription?: string
-  serviceLogoSrc?: string
-  homeTo?: string
-  logoText?: string | string[]
-  modelValue?: string
-  operatorImgAlt?: string
-  operatorImgSrc?: string
-  operatorImgStyle?: StyleValue
-  showOperatorLogo?: boolean
-  userName?: string
-  quickLinks?: DsfrHeaderMenuLinkProps[]
-  searchLabel?: string
-  quickLinksAriaLabel?: string
-  showSearch?: boolean
-  showBadge?: boolean
-  badgeText?: string
-  badgeStyle?: string
+type Props = {
+  userName: string | undefined
+  logoOperatorHeight: string | undefined
+  logoOperatorWidth: string | undefined
+  customSearch: boolean
 }
 
-const props = withDefaults(defineProps<DsfrHeaderProps>(), {
-  serviceTitle: undefined,
-  serviceDescription: undefined,
-  homeTo: '/',
-  logoText: () => 'Gouvernement',
-  modelValue: '',
+withDefaults(defineProps<DsfrHeaderProps & Props>(), {
   operatorImgAlt: '',
-  operatorImgSrc: '',
   operatorImgStyle: () => ({}),
-  showOperatorLogo: true,
-  serviceLogoSrc: '',
-  userName: undefined,
-  quickLinks: () => [],
   searchLabel: 'Recherche',
-  quickLinksAriaLabel: 'Menu secondaire',
-  showBadge: false,
-  badgeText: 'BETA',
-  badgeStyle: ''
+  quickLinks: () => [],
+  showSearch: config.website.header_search.display,
+  customSearch: false
 })
-const dropdown = config.website.header_search.dropdown
 
-const onKeyDown = (e: KeyboardEvent) => {
-  if (e.key === 'Escape') {
-    hideModal()
+// DsfrHeader does not expose the hidemodal function, so we do this to close the modal after a custom search.
+const headerRef = useTemplateRef('headerRef')
+
+const closeModal = () => {
+  const closeButton: HTMLButtonElement | undefined | null =
+    headerRef.value?.$el.querySelector('#close-button')
+  if (closeButton) {
+    // we need a timeout because of a '@keydown.enter' in DsfrSearchBar preventing the click to happen
+    setTimeout(() => {
+      closeButton.click()
+    }, 50)
   }
 }
-onMounted(() => {
-  document.addEventListener('keydown', onKeyDown)
-})
-onUnmounted(() => {
-  document.removeEventListener('keydown', onKeyDown)
-})
 
-const searchModalOpened = ref(false)
-const headerModalOpened = ref(false)
-
-const hideModal = (focusButtonMenu: boolean = true) => {
-  headerModalOpened.value = false
-  searchModalOpened.value = false
-  if (focusButtonMenu) {
-    document.getElementById('button-menu')?.focus()
-  }
-}
-const showMenu = () => {
-  headerModalOpened.value = true
-  searchModalOpened.value = false
-  document.getElementById('close-button')?.focus()
-}
-const showSearchModal = () => {
-  headerModalOpened.value = false
-  searchModalOpened.value = true
-}
-const onQuickLinkClick = hideModal
-
-const slots = useSlots()
-const isWithSlotOperator = computed(
-  () => Boolean(slots.operator?.().length) || !!props.operatorImgSrc
-)
-const isWithSlotNav = computed(() => Boolean(slots.mainnav))
-
-const badgeCss = 'fr-badge fr-badge--sm fr-badge--' + props.badgeStyle
+const logoText = config.website.rf_title
+const serviceTitle = config.website.title
+const serviceLogo = config.website.service_logo
+const logoOperator = config.website.logo_operator?.src
+const showLogoOperatorInHeader =
+  config.website.logo_operator?.show_in_header ?? true
+const showBadge = config.website.badge.display
+const badgeText = config.website.badge.text
+const badgeStyle = config.website.badge.style
+const dropdown = config.website.header_search.dropdown ?? undefined
 </script>
 
 <template>
-  <header role="banner" class="fr-header">
-    <div class="fr-header__body">
-      <div class="fr-container">
-        <div class="fr-header__body-row">
-          <div class="fr-header__brand fr-enlarge-link">
-            <div class="fr-header__brand-top">
-              <div class="fr-header__logo">
-                <DsfrLogo :logo-text="logoText" data-testid="header-logo" />
-              </div>
-              <div
-                v-if="isWithSlotOperator && showOperatorLogo"
-                class="fr-header__operator"
-              >
-                <!-- @slot Slot nommé operator pour le logo opérateur. Sera dans `<div class="fr-header__operator">` -->
-                <slot name="operator">
-                  <img
-                    v-if="operatorImgSrc"
-                    :src="operatorImgSrc"
-                    :alt="operatorImgAlt"
-                    class="fr-responsive-img"
-                    :style="operatorImgStyle"
-                  />
-                </slot>
-              </div>
-              <div
-                v-if="showSearch || isWithSlotNav || quickLinks?.length"
-                class="fr-header__navbar"
-              >
-                <button
-                  v-if="showSearch"
-                  class="fr-btn fr-btn--search"
-                  aria-controls="header-search"
-                  :aria-expanded="searchModalOpened"
-                  :data-fr-opened="searchModalOpened"
-                  @click.prevent.stop="showSearchModal()"
-                >
-                  <span class="fr-sr-only">Recherche</span>
-                </button>
-                <button
-                  v-if="isWithSlotNav || quickLinks?.length"
-                  id="button-menu"
-                  class="fr-btn--menu fr-btn"
-                  aria-controls="header-navigation"
-                  :aria-expanded="headerModalOpened"
-                  :data-fr-opened="headerModalOpened"
-                  data-testid="open-menu-btn"
-                  @click.prevent.stop="showMenu()"
-                >
-                  <span class="fr-sr-only">Menu</span>
-                </button>
-              </div>
-            </div>
-            <div v-if="!serviceLogoSrc" class="fr-header__service">
-              <RouterLink
-                :to="homeTo"
-                :title="`Retour à l'accueil du site ${serviceTitle}`"
-                v-bind="$attrs"
-              >
-                <span class="fr-grid-row fr-header__service-title"
-                  >{{ serviceTitle }}
-                  <span v-if="showBadge" :class="badgeCss">
-                    {{ badgeText }}
-                  </span>
-                </span>
-              </RouterLink>
-              <p v-if="serviceDescription" class="fr-header__service-tagline">
-                {{ serviceDescription }}
-              </p>
-            </div>
-            <div v-if="serviceLogoSrc" class="fr-header__service">
-              <RouterLink
-                :to="homeTo"
-                :title="`Retour à l'accueil du site ${serviceTitle}`"
-                v-bind="$attrs"
-                class="fr-grid-row fr-header__service-title"
-              >
-                <img
-                  :src="serviceLogoSrc"
-                  :alt="serviceTitle"
-                  class="fr-responsive-img service-logo"
-                />
-
-                <span v-if="showBadge" :class="badgeCss">{{ badgeText }}</span>
-              </RouterLink>
-            </div>
-          </div>
-          <div class="fr-header__tools">
-            <div
-              v-if="userName || quickLinks?.length"
-              class="fr-header__tools-links"
-            >
-              <p v-if="userName" class="fr-py-1w fr-mr-2v fr-text--sm">
-                {{ userName }}
-              </p>
-              <DsfrHeaderMenuLinks
-                v-if="!headerModalOpened && quickLinks?.length"
-                :links="quickLinks"
-                :nav-aria-label="quickLinksAriaLabel"
-              />
-            </div>
-            <div v-if="showSearch" class="fr-header__search fr-modal">
-              <SearchComponent
-                id="header-select-search"
-                :search-label="searchLabel"
-                :dropdown="dropdown"
-                placeholder="Rechercher"
-              />
-            </div>
-          </div>
-        </div>
-
-        <UseFocusTrap v-if="searchModalOpened">
-          <div
-            v-if="showSearch"
-            id="header-search"
-            class="fr-header__search fr-modal"
-            :class="{ 'fr-modal--opened': searchModalOpened }"
-            aria-label="Menu modal"
-            role="dialog"
-            aria-modal="true"
-          >
-            <div class="fr-container">
-              <button
-                id="close-button"
-                class="fr-btn fr-btn--close"
-                aria-controls="header-navigation"
-                data-testid="close-modal-btn"
-                @click.prevent.stop="hideModal()"
-              >
-                Fermer
-              </button>
-              <SearchComponent
-                v-if="searchModalOpened"
-                id="header-select-search-modal"
-                :search-label="searchLabel"
-                placeholder="Rechercher"
-                @search="hideModal(false)"
-              />
-            </div>
-          </div>
-        </UseFocusTrap>
-        <UseFocusTrap v-if="headerModalOpened">
-          <div
-            v-if="
-              isWithSlotNav || userName || (quickLinks && quickLinks.length)
-            "
-            id="header-navigation"
-            class="fr-header__menu fr-modal"
-            :class="{ 'fr-modal--opened': headerModalOpened }"
-            aria-label="Fenêtre menu"
-            role="dialog"
-            aria-modal="true"
-          >
-            <div class="fr-container">
-              <button
-                id="close-button"
-                class="fr-btn fr-btn--close"
-                aria-controls="header-navigation"
-                data-testid="close-modal-btn"
-                @click.prevent.stop="hideModal()"
-              >
-                Fermer
-              </button>
-              <div class="fr-header__menu-links">
-                <p v-if="userName" class="fr-py-1w">
-                  {{ userName }}
-                </p>
-                <DsfrHeaderMenuLinks
-                  v-if="headerModalOpened && quickLinks?.length"
-                  role="navigation"
-                  :links="quickLinks"
-                  :nav-aria-label="quickLinksAriaLabel"
-                  @link-click="onQuickLinkClick"
-                />
-              </div>
-              <template v-if="headerModalOpened">
-                <slot name="mainnav" :hidemodal="hideModal" />
-              </template>
-            </div>
-          </div>
-        </UseFocusTrap>
-        <slot />
+  <DsfrHeader
+    ref="headerRef"
+    home-to="/"
+    :logo-text
+    :service-title="serviceLogo ? undefined : serviceTitle"
+    :operator-img-src="showLogoOperatorInHeader ?? logoOperator"
+    :operator-img-alt
+    :operator-img-style
+    service-description=""
+    :quick-links
+    :show-search="showSearch && !customSearch"
+  >
+    <!-- needed because of logo + badge -->
+    <template #operator>
+      <div v-if="showLogoOperatorInHeader && logoOperator">
+        <img
+          class="fr-responsive-img operator-logo"
+          :src="logoOperator"
+          alt=""
+          :style="operatorImgStyle"
+          :height="logoOperatorHeight"
+          :width="logoOperatorWidth"
+        />
       </div>
-    </div>
-    <div
-      v-if="isWithSlotNav && !headerModalOpened && !searchModalOpened"
-      class="fr-hidden fr-unhidden-lg fr-header__menu"
-    >
-      <div class="fr-container">
-        <!-- @slot Slot nommé mainnav pour le menu de navigation principal -->
-        <slot name="mainnav" :hidemodal="hideModal" />
+      <div v-if="serviceLogo">
+        <img
+          class="fr-responsive-img service-logo"
+          :src="serviceLogo"
+          :alt="serviceTitle"
+        />
       </div>
-    </div>
-  </header>
+      <span
+        v-if="showBadge"
+        :class="`fr-badge fr-badge--sm fr-badge--${badgeStyle}`"
+      >
+        {{ badgeText }}
+      </span>
+    </template>
+
+    <template #after-quick-links>
+      <SearchComponent
+        v-if="customSearch"
+        id="header-select-search"
+        class="custom-search"
+        :search-label="searchLabel"
+        :dropdown="dropdown"
+        placeholder="Rechercher"
+        @do-search="closeModal"
+      />
+    </template>
+
+    <template #mainnav="{ hidemodal }">
+      <Navigation :on-click="hidemodal" />
+    </template>
+  </DsfrHeader>
 </template>
 
 <style scoped>
-.service-logo {
-  height: 35px;
-  margin: 0;
-  width: auto;
+.operator-logo {
+  inline-size: v-bind(logoOperatorWidth);
+  block-size: v-bind(logoOperatorHeight);
 }
-.fr-header__service-title {
-  align-items: center;
-  gap: 0.25em;
+.service-logo {
+  max-block-size: 35px;
+}
+:deep(.fr-header__brand-top) {
+  flex-wrap: wrap;
+
+  .fr-header__operator {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  @media (max-width: 62em) {
+    .fr-header__operator {
+      flex: 1 1 100%;
+      padding-top: 0;
+      order: 3;
+    }
+    .fr-header__navbar {
+      margin-right: 0;
+      align-self: center;
+      order: 2;
+    }
+  }
 }
 :deep(.fr-header__tools-links) {
+  flex-wrap: wrap;
   align-items: center;
+
+  & > nav {
+    flex: 1 0 100%;
+  }
+
+  & > :last-child.custom-search {
+    flex: 1 0 100%;
+    max-inline-size: min(24rem, 100%);
+  }
+}
+:deep(.custom-search) input + .fr-btn {
+  background-color: var(--background-action-high-blue-france);
+  color: var(--text-inverted-blue-france);
+
+  &:hover {
+    background-color: var(--hover-tint);
+  }
 }
 </style>

@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { onMounted, ref, type PropType, type Ref } from 'vue'
-import Multiselect from 'vue-multiselect'
-import 'vue-multiselect/dist/vue-multiselect.css'
+import { onMounted, ref, type PropType } from 'vue'
 
-import '@/assets/multiselect.css'
+import Multiselect from '@vueform/multiselect'
+import '@vueform/multiselect/themes/default.css'
+
 import type { SpatialCoverage, SpatialCoverageLevel } from '@/model/spatial'
 import SpatialAPI from '@/services/api/SpatialAPI'
 import { useSpatialStore } from '@/store/SpatialStore'
+
+import { debounceWait } from '@/utils/config'
 
 const selectedSpatialCoverage = defineModel('spatialCoverageModel', {
   type: Object as PropType<SpatialCoverage>
@@ -17,16 +19,10 @@ defineProps({
   short: {
     type: Boolean,
     default: false
-  },
-  placeholder: {
-    type: String,
-    default: 'ex: Toulouse Métropole'
   }
 })
 
 const isLoading = ref(false)
-
-const options: Ref<SpatialCoverage[]> = ref([])
 
 const getLevelById = (levelId: string): SpatialCoverageLevel | undefined => {
   return useSpatialStore().getLevelById(levelId)
@@ -35,16 +31,19 @@ const getLevelById = (levelId: string): SpatialCoverageLevel | undefined => {
 const search = useDebounceFn(async (query: string) => {
   isLoading.value = true
   if (!query) {
-    options.value = []
     isLoading.value = false
     return
   }
-  const zones = await new SpatialAPI().suggestZones(query, {
-    page_size: 10
-  })
-  options.value = zones
-  isLoading.value = false
-}, 400)
+  try {
+    return await new SpatialAPI().suggestZones(query, {
+      page_size: 10
+    })
+  } catch (error) {
+    console.error('Search error', error)
+  } finally {
+    isLoading.value = false
+  }
+}, debounceWait)
 
 const clear = () => {
   selectedSpatialCoverage.value = undefined
@@ -58,56 +57,69 @@ onMounted(() => {
 <template>
   <Multiselect
     id="select-spatial-coverage"
-    ref="multiselect"
     v-model="selectedSpatialCoverage"
-    class="fr-input-wrap"
-    :options="options"
+    role="search"
+    :object="true"
+    value-prop="id"
     label="name"
-    track-by="id"
+    track-by="name"
+    class="fr-input-wrap"
+    :filter-results="false"
+    :min-chars="3"
+    :clear-on-search="true"
+    :delay="0"
+    :options="search"
     placeholder=""
-    :select-label="short ? '' : 'Entrée pour sélectionner'"
-    :deselect-label="short ? '' : 'Entrée pour supprimer'"
-    :multiple="false"
+    :resolve-on-load="false"
     :searchable="true"
-    :internal-search="false"
-    :loading="isLoading"
-    :clear-on-select="true"
-    :close-on-select="true"
-    :max-height="600"
-    :show-no-results="false"
-    :hide-selected="false"
-    @search-change="search"
+    :limit="10"
+    :strict="false"
+    :clear-on-blur="false"
+    :allow-absent="true"
+    no-options-text="Aucune couverture territoriale trouvée, précisez ou élargissez votre recherche."
+    :aria="{
+      // useless or unsupported yet https://github.com/vueform/multiselect/issues/436
+      'aria-labelledby': null,
+      'aria-multiselectable': null,
+      'aria-placeholder': null
+    }"
   >
-    <template #caret>
-      <div
-        v-if="selectedSpatialCoverage"
-        class="multiselect__clear"
-        @mousedown.prevent.stop="clear"
-      ></div>
+    <template #clear>
+      <button
+        class="multiselect-clear"
+        @click="clear"
+        @keydown.prevent.enter="clear"
+        @keydown.prevent.space="clear"
+      >
+        <span class="fr-sr-only">Supprimer la sélection</span>
+        <span aria-hidden class="multiselect-clear-icon"></span>
+      </button>
     </template>
-    <template #singleLabel="slotProps">
-      <div>
+
+    <template #singlelabel="{ value }">
+      <div class="multiselect-single-label fr-py-2w">
         <span v-if="short">
-          {{ slotProps.option.name }}
+          {{ value.name }}
         </span>
         <span v-else>
-          {{ getLevelById(slotProps.option.level)?.name }} :
-          {{ slotProps.option.name }} ({{ slotProps.option.code }})
+          {{ getLevelById(value.level)?.name }} : {{ value.name }} ({{
+            value.code
+          }})
         </span>
       </div>
     </template>
-    <template #option="slotProps">
+
+    <template #option="{ option }">
       <div class="spatial-select-option">
         <div class="header">
-          <span class="name">{{ slotProps.option.name }}</span>
-          <span class="code fr-ml-1v">{{ slotProps.option.code }}</span>
+          <span class="name">{{ option.name }}</span>
+          <span class="code fr-ml-1v">{{ option.code }}</span>
         </div>
         <div class="level">
-          {{ getLevelById(slotProps.option.level)?.name }}
+          {{ getLevelById(option.level)?.name }}
         </div>
       </div>
     </template>
-    <template #noOptions> Précisez ou élargissez votre recherche </template>
   </Multiselect>
 </template>
 

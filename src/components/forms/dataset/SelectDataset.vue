@@ -7,8 +7,10 @@ import Multiselect from '@vueform/multiselect'
 import '@vueform/multiselect/themes/default.css'
 
 import '@/assets/multiselect.css'
+
 import type { DatasetProperties } from '@/model/topic'
 import SearchAPI from '@/services/api/SearchAPI'
+import { debounceWait } from '@/utils/config'
 
 const selectedDataset = defineModel({
   type: Object as () => DatasetV2
@@ -47,7 +49,7 @@ const search = useDebounceFn(async (query: string) => {
   } finally {
     isLoading.value = false
   }
-}, 600)
+}, debounceWait)
 
 const clear = () => {
   selectedDataset.value = undefined
@@ -64,6 +66,7 @@ const clear = () => {
   <Multiselect
     id="input-dataset"
     v-model="selectedDataset"
+    role="search"
     :object="true"
     value-prop="id"
     label="title"
@@ -106,6 +109,7 @@ const clear = () => {
     </template>
     <template #clear>
       <button
+        type="button"
         class="multiselect-clear"
         @click="clear"
         @keydown.enter="clear"
@@ -119,18 +123,6 @@ const clear = () => {
 </template>
 
 <style scoped>
-:deep(.multiselect__option::after) {
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  block-size: 1px;
-  overflow: hidden;
-  position: absolute;
-  white-space: nowrap;
-  inline-size: 1px;
-}
-.multiselect {
-  --ms-max-height: 400px;
-}
 .multiselect-single-label {
   position: relative;
   margin-inline-end: auto;

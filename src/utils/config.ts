@@ -34,3 +34,6 @@ export const useTopicsConf = (): TopicsConfNormalized => {
     topicsActivateReadMore: topicsConf.activate_read_more
   }
 }
+
+// Get debounce value or set default.
+export const debounceWait: number = config.website.default_debounce_wait ?? 600

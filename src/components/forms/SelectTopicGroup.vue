@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { DatasetProperties, DatasetsGroups } from '@/model/topic'
+
 import Multiselect from '@vueform/multiselect'
 import '@vueform/multiselect/themes/default.css'
 
@@ -57,6 +58,7 @@ const trimGroupName = (groupName: string) => {
   <Multiselect
     id="regroupement-input"
     v-model="datasetProperties.group"
+    role="search"
     :options="groupOptions"
     :searchable="true"
     :limit="5"
@@ -83,6 +85,7 @@ const trimGroupName = (groupName: string) => {
 
     <template #clear>
       <button
+        type="button"
         class="multiselect-clear"
         @click="clear"
         @keydown.enter="clear"

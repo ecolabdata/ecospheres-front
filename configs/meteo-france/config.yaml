@@ -38,6 +38,7 @@ website:
         sub_section_datasets:
         sub_section_cards:
         sub_section_tiles:
+          class: fr-col-md-6
           title:
           tiles:
             - id: '6571f26dc009674feb726be9'
@@ -145,6 +146,8 @@ website:
     display: false
     content: Notice avec un [lien beta](/beta) et du _style_
     closeable: false
+  # debounce high enough for accessibility (screen readers will announce results)
+  default_debounce_wait: 600
   # display settings
   pagination_sizes:
     organizations_list: 9

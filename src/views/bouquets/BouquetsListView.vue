@@ -16,7 +16,7 @@ import {
 import { NoOptionSelected } from '@/model/theme'
 import { useUserStore } from '@/store/UserStore'
 import { fromMarkdown } from '@/utils'
-import { useTopicsConf } from '@/utils/config'
+import { debounceWait, useTopicsConf } from '@/utils/config'
 
 const { topicsSlug, topicsName } = useTopicsConf()
 
@@ -118,7 +118,7 @@ const search = useDebounceFn(() => {
     .then(() => {
       setLiveResults()
     })
-}, 600)
+}, debounceWait)
 
 watch(
   props,

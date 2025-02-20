@@ -6,7 +6,7 @@ _ecologie_.**data.gouv**._fr_ est un catalogue permettant la centralisation des 
 
 ## À qui s'adresse cette plateforme ?
 
-_ecologie_.**data.gouv**._fr_ s'adresse aux agents publics des administrations centrales, services déconcentrés et des collectivités territoriales oeuvrant à déployer les politiques publiques portées par le [Ministère en charge de l&rsquo;environnement](https://www.ecologie.gouv.fr/). L'accès aux données brutes permet également à la société civile, au secteur privé ou encore à l'administration de s'en emparer dans un but de réutilisation.
+_ecologie_.**data.gouv**._fr_ s'adresse aux agents publics des administrations centrales, services déconcentrés et des collectivités territoriales oeuvrant à déployer les politiques publiques portées par le [ministère en charge de l&rsquo;environnement](https://www.ecologie.gouv.fr/). L'accès aux données brutes permet également à la société civile, au secteur privé ou encore à l'administration de s'en emparer dans un but de réutilisation.
 
 ## Les données ouvertes&nbsp;: qu'est-ce que c'est ?
 
